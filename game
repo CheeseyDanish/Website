@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idle Clicker Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        button { font-size: 20px; padding: 10px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Idle Clicker Game</h1>
+    <p>Points: <span id="points">0</span></p>
+    <button onclick="earnPoints()">Click for Points</button>
+    <button onclick="buyUpgrade()">Buy Upgrade (Cost: <span id="upgradeCost">10</span> points)</button>
+    <p>Points per second: <span id="pps">0</span></p>
+    
+    <script>
+        let points = 0;
+        let pointsPerSecond = 0;
+        let upgradeCost = 10;
+
+        function earnPoints() {
+            points++;
+            updateUI();
+        }
+
+        function buyUpgrade() {
+            if (points >= upgradeCost) {
+                points -= upgradeCost;
+                pointsPerSecond++;
+                upgradeCost = Math.floor(upgradeCost * 1.5);
+                updateUI();
+            } else {
+                alert("Not enough points!");
+            }
+        }
+
+        function updateUI() {
+            document.getElementById("points").innerText = points;
+            document.getElementById("pps").innerText = pointsPerSecond;
+            document.getElementById("upgradeCost").innerText = upgradeCost;
+        }
+
+        setInterval(() => {
+            points += pointsPerSecond;
+            updateUI();
+        }, 1000);
+    </script>
+</body>
+</html>
