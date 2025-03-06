@@ -3,420 +3,714 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pachinko RPG Idle Game</title>
+    <title>Pachinko RPG & Idle Game</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background: #f4f4f4; }
-        button { font-size: 16px; padding: 10px; margin: 10px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        canvas { background: #333; display: block; margin: auto; border: 5px solid #555; border-radius: 10px; }
-        .minigame { display: none; margin-top: 20px; }
-        .prestige-menu { display: none; margin-top: 20px; }
-        h1 { color: #333; }
-        p { font-size: 18px; color: #555; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+        .tab { overflow: hidden; border: 1px solid #ccc; background-color: #f1f1f1; }
+        .tab button { background-color: inherit; float: left; border: none; outline: none; cursor: pointer; padding: 14px 16px; transition: 0.3s; font-size: 17px; }
+        .tab button:hover { background-color: #ddd; }
+        .tab button.active { background-color: #ccc; }
+        .tabcontent { display: none; padding: 6px 12px; border: 1px solid #ccc; border-top: none; }
+        .game-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        canvas { background: #ecf0f1; border-radius: 5px; }
+        button { margin: 5px; padding: 8px 15px; background: #3498db; border: none; color: white; border-radius: 5px; cursor: pointer; }
+        .stats { margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <h1>Pachinko RPG Idle Game</h1>
-    <p>Gold: <span id="gold">0</span></p>
-    <p>Average Gold/s: <span id="goldPerSecond">0</span></p>
-    <button onclick="dropBall()">Drop Hero</button>
-    <button id="ballValueUpgradeButton" onclick="upgradeBallValue()">Upgrade Ball Value (Cost: <span id="ballUpgradeCost">25</span> gold)</button>
-    <button id="autoDropUpgradeButton" onclick="upgradeAutoDrop()">Upgrade Auto Drop (Cost: <span id="autoDropUpgradeCost">50</span> gold)</button>
-    <button id="pegBonusUpgradeButton" onclick="upgradePegBonus()" style="display: none;">Upgrade Peg Bonus (Cost: <span id="pegUpgradeCost">75</span> gold)</button>
-    <button id="ballLimitUpgradeButton" onclick="upgradeBallLimit()" style="display: none;">Upgrade Ball Limit (Cost: <span id="limitUpgradeCost">50</span> gold)</button>
-    <button id="boardSizeUpgradeButton" onclick="upgradeBoardSize()" style="display: none;">Upgrade Board Size (Cost: <span id="boardUpgradeCost">100</span> gold)</button>
-    <button id="prestigeButton" onclick="prestige()" style="display: none;">Prestige (Gain <span id="prestigeBonus">0</span> Prestige Points)</button>
-    <button onclick="startMinigame()">Play Mini-Game</button>
-    <div class="prestige-menu">
-        <h2>Prestige Upgrades</h2>
-        <button onclick="buyGoldenBallUpgrade()">Golden Ball Chance (Cost: <span id="goldenBallUpgradeCost">1</span> PP)</button>
-        <button onclick="toggleBucketMultiplier()">Toggle Bucket Multipliers (Cost: <span id="bucketMultiplierUpgradeCost">2</span> PP)</button>
-        <button onclick="buyMagnetUpgrade()">Magnet Upgrade (Cost: <span id="magnetUpgradeCost">3</span> PP)</button>
+
+<div class="tab">
+    <button class="tablinks" onclick="openGame(event, 'PachinkoRPG')">Pachinko RPG</button>
+    <button class="tablinks" onclick="openGame(event, 'PachinkoIdle')">Pachinko Idle Game</button>
+</div>
+
+<div id="PachinkoRPG" class="tabcontent">
+    <div class="game-container">
+        <div class="rpg-interface">
+            <div class="stats">
+                <h2>Adventurer's Log</h2>
+                <p>Level: <span id="level">1</span></p>
+                <p>EXP: <span id="exp">0</span>/100</p>
+                <p>Health: <span id="health">100</span>/100</p>
+                <p>Resources: 
+                    <span style="color: #8b4513">Wood: <span id="wood">0</span></span> | 
+                    <span style="color: #808080">Ore: <span id="ore">0</span></span> | 
+                    <span style="color: #ffd700">Gold: <span id="gold">0</span></span>
+                </p>
+            </div>
+            <div id="actions">
+                <h3>Choose Action:</h3>
+                <button onclick="startAction('chop_wood')">🪓 Chop Wood</button>
+                <button onclick="startAction('mine_ore')">⛏️ Mine Ore</button>
+                <button onclick="startAction('fight')">⚔️ Fight Enemy</button>
+                <button onclick="startAction('smelt')">🔥 Smelt Ore</button>
+                <button onclick="startAction('rest')">⛺ Rest</button>
+            </div>
+            <div id="action-result" style="margin-top: 20px;"></div>
+        </div>
+        
+        <div class="pachinko-container" style="display: none;" id="pachinkoContainer">
+            <h3>Action Resolution</h3>
+            <canvas id="pachinkoCanvas" width="300" height="400"></canvas>
+            <div id="pachinkoResult" style="margin-top: 10px;"></div>
+        </div>
     </div>
-    <canvas id="pachinkoCanvas" width="400" height="400"></canvas>
-    <div class="minigame">
-        <h2>Mini-Game: Catch the Silly Faces!</h2>
-        <canvas id="minigameCanvas" width="400" height="400"></canvas>
+</div>
+
+<div id="PachinkoIdle" class="tabcontent">
+    <div class="game-container">
+        <h1>Pachinko RPG Idle Game</h1>
+        <p>Gold: <span id="idleGold">0</span></p>
+        <p>Average Gold/s: <span id="goldPerSecond">0</span></p>
+        <button onclick="idleDropBall()">Drop Hero</button>
+        <button id="ballValueUpgradeButton" onclick="upgradeBallValue()">Upgrade Ball Value (Cost: <span id="ballUpgradeCost">25</span> gold)</button>
+        <button id="autoDropUpgradeButton" onclick="upgradeAutoDrop()">Upgrade Auto Drop (Cost: <span id="autoDropUpgradeCost">50</span> gold)</button>
+        <button id="pegBonusUpgradeButton" onclick="upgradePegBonus()" style="display: none;">Upgrade Peg Bonus (Cost: <span id="pegUpgradeCost">75</span> gold)</button>
+        <button id="ballLimitUpgradeButton" onclick="upgradeBallLimit()" style="display: none;">Upgrade Ball Limit (Cost: <span id="limitUpgradeCost">50</span> gold)</button>
+        <button id="boardSizeUpgradeButton" onclick="upgradeBoardSize()" style="display: none;">Upgrade Board Size (Cost: <span id="boardUpgradeCost">100</span> gold)</button>
+        <button id="prestigeButton" onclick="prestige()" style="display: none;">Prestige (Gain <span id="prestigeBonus">0</span> Prestige Points)</button>
+        <button onclick="startMinigame()">Play Mini-Game</button>
+        <div class="prestige-menu">
+            <h2>Prestige Upgrades</h2>
+            <button onclick="buyGoldenBallUpgrade()">Golden Ball Chance (Cost: <span id="goldenBallUpgradeCost">1</span> PP)</button>
+            <button onclick="toggleBucketMultiplier()">Toggle Bucket Multipliers (Cost: <span id="bucketMultiplierUpgradeCost">2</span> PP)</button>
+            <button onclick="buyMagnetUpgrade()">Magnet Upgrade (Cost: <span id="magnetUpgradeCost">3</span> PP)</button>
+        </div>
+        <canvas id="idlePachinkoCanvas" width="400" height="400"></canvas>
+        <div class="minigame">
+            <h2>Mini-Game: Catch the Silly Faces!</h2>
+            <canvas id="minigameCanvas" width="400" height="400"></canvas>
+        </div>
     </div>
+</div>
 
-    <script>
-        let gold = 0;
-        let ballValue = 1;
-        let pegBonus = 1;
-        let ballLimit = 3;
-        let autoDropInterval = 1000;
-        let autoDropLevel = 0;
-        let prestigePoints = 0;
-        let globalMultiplier = 1;
-        let ballUpgradeCost = 25;
-        let pegUpgradeCost = 75;
-        let limitUpgradeCost = 50;
-        let boardUpgradeCost = 100;
-        let autoDropUpgradeCost = 50;
-        let goldenBallChance = 0; // Chance to spawn a golden ball
-        let goldenBallUpgradeCost = 1;
-        let bucketMultiplierUpgradeCost = 2;
-        let magnetUpgradeCost = 3;
-        let bucketMultiplierToggled = false;
-        let magnetActive = false; // Magnet upgrade to attract balls to higher-value buckets
-        let balls = [];
-        let pegs = [];
-        let canvasWidth = 400;
-        let canvasHeight = 400;
-        let buckets = [];
-        let goldPerSecond = 0;
-        let goldHistory = [];
-        let minigameActive = false;
+<script>
+// Tab functionality
+function openGame(evt, gameName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(gameName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
 
-        const canvas = document.getElementById("pachinkoCanvas");
-        const ctx = canvas.getContext("2d");
-        const minigameCanvas = document.getElementById("minigameCanvas");
-        const minigameCtx = minigameCanvas.getContext("2d");
+// Initialize the first tab as active
+document.getElementsByClassName("tablinks")[0].click();
 
-        function createBuckets() {
-            const bucketMultipliers = [2, 1, 0.5, 5, 0, 5, 0.5, 1, 2];
-            const totalWidth = canvasWidth;
-            const bucketWidth = totalWidth / bucketMultipliers.length;
-            buckets = bucketMultipliers.map((multiplier, index) => ({
-                x: index * bucketWidth,
-                width: multiplier === 5 || multiplier === 2 || multiplier === 0 ? bucketWidth * 0.8 : bucketWidth, // Smaller buckets for 5x, 2x, and 0x
-                multiplier: multiplier,
-                color: multiplier === 5 ? "gold" : multiplier === 2 ? "lightgreen" : multiplier === 1 ? "lightblue" : multiplier === 0 ? "gray" : "lightcoral"
-            }));
-        }
+// Pachinko RPG Game Script
+let player = {
+    level: 1,
+    exp: 0,
+    health: 100,
+    wood: 0,
+    ore: 0,
+    gold: 0,
+    currentAction: null
+};
 
-        class Ball {
-            constructor(x) {
-                this.x = x;
-                this.y = 0;
-                this.vx = (Math.random() - 0.5) * 2;
-                this.vy = 0;
-                this.radius = 10;
-                this.value = ballValue;
-                this.isGolden = Math.random() < goldenBallChance; // Chance to be a golden ball
-                this.hitPegs = [];
-                this.combo = 1; // Combo multiplier for pegs
-            }
-            update() {
-                this.vy += 0.1; // Increased gravity
-                this.y += this.vy;
-                this.x += this.vx;
+let pachinko = {
+    active: false,
+    balls: [],
+    pegs: [],
+    buckets: [],
+    canvasWidth: 300,
+    canvasHeight: 400,
+    ctx: null,
+    actionMultiplier: 1
+};
 
-                // Magnet effect: attract balls toward higher-value buckets
-                if (magnetActive) {
-                    let targetBucket = buckets.reduce((a, b) => a.multiplier > b.multiplier ? a : b);
-                    let dx = (targetBucket.x + targetBucket.width / 2) - this.x;
-                    this.vx += dx * 0.01; // Gentle attraction
-                }
+const canvas = document.getElementById('pachinkoCanvas');
+pachinko.ctx = canvas.getContext('2d');
 
-                // Ball hitting walls
-                if (this.x - this.radius < 0 || this.x + this.radius > canvasWidth) {
-                    this.vx = -this.vx * 0.5;
-                }
+const actions = {
+    chop_wood: {
+        name: "Wood Chopping",
+        buckets: [0.5, 1, 2, 3, 2, 1, 0.5],
+        baseYield: 5,
+        risk: 0.1
+    },
+    mine_ore: {
+        name: "Mining",
+        buckets: [0.3, 0.7, 1.5, 2, 1.5, 0.7, 0.3],
+        baseYield: 3,
+        risk: 0.2
+    },
+    fight: {
+        name: "Combat",
+        buckets: [0, 1, 1.5, 2, 1.5, 1, 0],
+        baseYield: 20,
+        risk: 0.3
+    },
+    smelt: {
+        name: "Smelting",
+        buckets: [0.8, 1, 1.2, 1.5, 1.2, 1, 0.8],
+        baseYield: 2,
+        risk: 0.05
+    },
+    rest: {
+        name: "Resting",
+        buckets: [0.5, 0.8, 1.2, 1.5, 1.2, 0.8, 0.5],
+        baseYield: 15,
+        risk: 0
+    }
+};
 
-                // Ball hitting bucket borders
-                for (let bucket of buckets) {
-                    if (this.y + this.radius > canvasHeight - 50 && this.x > bucket.x && this.x < bucket.x + bucket.width) {
-                        // Funnel ball into the bucket
-                        let bucketCenter = bucket.x + bucket.width / 2;
-                        this.vx += (bucketCenter - this.x) * 0.05;
-                    }
-                }
+function startAction(actionType) {
+    player.currentAction = actionType;
+    document.getElementById('actions').style.display = 'none';
+    document.getElementById('pachinkoContainer').style.display = 'block';
+    setupPachinko(actions[actionType]);
+    dropBall();
+}
 
-                // Ball hitting pegs
-                for (let peg of pegs) {
-                    let dx = peg.x - this.x;
-                    let dy = peg.y - this.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < this.radius + peg.radius && !this.hitPegs.includes(peg)) {
-                        this.vy = -this.vy * 0.5;
-                        this.vx += (Math.random() - 0.5) * 1;
-                        this.value += Math.floor(pegBonus * this.combo); // Combo increases peg bonus (integer)
-                        this.combo += 0.1; // Increase combo for each peg hit
-                        this.hitPegs.push(peg);
-                    }
-                }
+function setupPachinko(action) {
+    pachinko.buckets = action.buckets.map((multiplier, index) => ({
+        x: (index * pachinko.canvasWidth) / action.buckets.length,
+        width: pachinko.canvasWidth / action.buckets.length,
+        multiplier: multiplier,
+        color: getBucketColor(multiplier)
+    }));
+    
+    createPegs();
+    drawGame();
+}
 
-                // Ball falls into a bucket
-                if (this.y > canvasHeight) {
-                    let bucket = buckets.find(b => this.x > b.x && this.x < b.x + b.width);
-                    if (bucket) {
-                        let multiplier = bucket.multiplier;
-                        if (bucketMultiplierToggled) {
-                            if (multiplier === 2 || multiplier === 5) multiplier *= 2;
-                            if (multiplier === 0.5) multiplier /= 2;
-                        }
-                        gold += Math.floor(this.value * multiplier * globalMultiplier * (this.isGolden ? 5 : 1)); // Golden balls are worth 5x (integer)
-                    }
-                    balls.splice(balls.indexOf(this), 1);
-                    updateUI();
-                }
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.isGolden ? "gold" : "blue";
-                ctx.fill();
-                ctx.closePath();
-                ctx.fillStyle = "white";
-                ctx.font = "12px Arial";
-                ctx.textAlign = "center";
-                ctx.fillText(Math.floor(this.value), this.x, this.y + 4); // Centered text (integer)
-            }
-        }
+function getBucketColor(multiplier) {
+    return multiplier === 0 ? '#ff0000' :
+           multiplier >= 2 ? '#2ecc71' :
+           multiplier >= 1 ? '#f1c40f' :
+           '#e74c3c';
+}
 
-        class Peg {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.radius = 5;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = "red";
-                ctx.fill();
-                ctx.closePath();
-            }
-        }
+class Ball {
+    constructor() {
+        this.x = pachinko.canvasWidth/2 + (Math.random()-0.5)*50;
+        this.y = 0;
+        this.vx = (Math.random()-0.5)*2;
+        this.vy = 0;
+        this.radius = 8;
+    }
+}
 
-        function drawBuckets() {
-            buckets.forEach(bucket => {
-                ctx.fillStyle = bucket.color;
-                ctx.fillRect(bucket.x, canvasHeight - 50, bucket.width, 50);
-                ctx.strokeStyle = "black";
-                ctx.lineWidth = 2;
-                ctx.strokeRect(bucket.x, canvasHeight - 50, bucket.width, 50); // Draw bucket borders
-                ctx.fillStyle = "black";
-                ctx.font = "16px Arial";
-                ctx.textAlign = "center";
-                ctx.fillText(bucket.multiplier + "x", bucket.x + bucket.width / 2, canvasHeight - 20); // Draw multiplier text
+function createPegs() {
+    pachinko.pegs = [];
+    for(let i=0; i<8; i++) {
+        for(let j=0; j<5; j++) {
+            pachinko.pegs.push({
+                x: 50 + i*30 + (j%2)*15,
+                y: 50 + j*40,
+                radius: 4
             });
         }
+    }
+}
 
-        function dropBall() {
-            if (balls.length < ballLimit) {
-                balls.push(new Ball(Math.random() * canvasWidth));
+function drawGame() {
+    pachinko.ctx.clearRect(0, 0, pachinko.canvasWidth, pachinko.canvasHeight);
+    
+    // Draw buckets
+    pachinko.buckets.forEach(bucket => {
+        pachinko.ctx.fillStyle = bucket.color;
+        pachinko.ctx.fillRect(bucket.x, pachinko.canvasHeight-50, bucket.width, 50);
+    });
+    
+    // Draw pegs
+    pachinko.pegs.forEach(peg => {
+        pachinko.ctx.beginPath();
+        pachinko.ctx.arc(peg.x, peg.y, peg.radius, 0, Math.PI*2);
+        pachinko.ctx.fillStyle = '#7f8c8d';
+        pachinko.ctx.fill();
+    });
+    
+    // Draw balls
+    pachinko.balls.forEach(ball => {
+        pachinko.ctx.beginPath();
+        pachinko.ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
+        pachinko.ctx.fillStyle = '#3498db';
+        pachinko.ctx.fill();
+    });
+}
+
+function gameLoop() {
+    pachinko.balls.forEach(ball => {
+        ball.vy += 0.1;
+        ball.y += ball.vy;
+        ball.x += ball.vx;
+        
+        // Peg collisions
+        pachinko.pegs.forEach(peg => {
+            const dx = peg.x - ball.x;
+            const dy = peg.y - ball.y;
+            if(Math.sqrt(dx*dx + dy*dy) < peg.radius + ball.radius) {
+                ball.vx = (ball.x - peg.x)*0.1;
+                ball.vy = -Math.abs(ball.vy)*0.8;
             }
-        }
-
-        function upgradeBallValue() {
-            if (gold >= ballUpgradeCost) {
-                gold -= ballUpgradeCost;
-                ballValue++;
-                ballUpgradeCost = Math.floor(ballUpgradeCost * 1.2);
-                updateUI();
-            }
-        }
-
-        function upgradeAutoDrop() {
-            if (gold >= autoDropUpgradeCost) {
-                gold -= autoDropUpgradeCost;
-                autoDropInterval = Math.max(100, autoDropInterval * 0.9);
-                autoDropLevel++;
-                autoDropUpgradeCost = Math.floor(autoDropUpgradeCost * 1.2);
-                updateUI();
-            }
-        }
-
-        function upgradePegBonus() {
-            if (gold >= pegUpgradeCost) {
-                gold -= pegUpgradeCost;
-                pegBonus++;
-                pegUpgradeCost = Math.floor(pegUpgradeCost * 1.2);
-                updateUI();
-            }
-        }
-
-        function upgradeBallLimit() {
-            if (gold >= limitUpgradeCost) {
-                gold -= limitUpgradeCost;
-                ballLimit++;
-                limitUpgradeCost = Math.floor(limitUpgradeCost * 1.2);
-                updateUI();
-            }
-        }
-
-        function upgradeBoardSize() {
-            if (gold >= boardUpgradeCost) {
-                gold -= boardUpgradeCost;
-                canvasWidth += 100;
-                canvasHeight += 100;
-                canvas.width = canvasWidth;
-                canvas.height = canvasHeight;
-                boardUpgradeCost = Math.floor(boardUpgradeCost * 1.5);
-                createPegs();
-                createBuckets();
-                updateUI();
-            }
-        }
-
-        function prestige() {
-            if (gold >= 1000) {
-                prestigePoints += Math.floor(gold / 1000);
-                gold = 0;
-                ballValue = 1;
-                pegBonus = 1;
-                ballLimit = 3;
-                autoDropInterval = 1000;
-                autoDropLevel = 0;
-                ballUpgradeCost = 25;
-                pegUpgradeCost = 75;
-                limitUpgradeCost = 50;
-                boardUpgradeCost = 100;
-                autoDropUpgradeCost = 50;
-                canvasWidth = 400;
-                canvasHeight = 400;
-                canvas.width = canvasWidth;
-                canvas.height = canvasHeight;
-                createPegs();
-                createBuckets();
-                globalMultiplier += prestigePoints * 0.1;
-                document.querySelector(".prestige-menu").style.display = "block";
-                updateUI();
-            }
-        }
-
-        function buyGoldenBallUpgrade() {
-            if (prestigePoints >= goldenBallUpgradeCost) {
-                prestigePoints -= goldenBallUpgradeCost;
-                goldenBallChance += 0.01; // Increase chance by 1%
-                goldenBallUpgradeCost += 1;
-                updateUI();
-            }
-        }
-
-        function toggleBucketMultiplier() {
-            if (prestigePoints >= bucketMultiplierUpgradeCost) {
-                prestigePoints -= bucketMultiplierUpgradeCost;
-                bucketMultiplierToggled = !bucketMultiplierToggled;
-                updateUI();
-            }
-        }
-
-        function buyMagnetUpgrade() {
-            if (prestigePoints >= magnetUpgradeCost) {
-                prestigePoints -= magnetUpgradeCost;
-                magnetActive = true;
-                updateUI();
-            }
-        }
-
-        function updateUI() {
-            document.getElementById("gold").innerText = Math.floor(gold);
-            document.getElementById("ballUpgradeCost").innerText = Math.floor(ballUpgradeCost);
-            document.getElementById("autoDropUpgradeCost").innerText = Math.floor(autoDropUpgradeCost);
-            document.getElementById("pegUpgradeCost").innerText = Math.floor(pegUpgradeCost);
-            document.getElementById("limitUpgradeCost").innerText = Math.floor(limitUpgradeCost);
-            document.getElementById("boardUpgradeCost").innerText = Math.floor(boardUpgradeCost);
-            document.getElementById("prestigeBonus").innerText = Math.floor(prestigePoints + (gold / 1000)); // Show accurate Prestige Points
-            document.getElementById("goldenBallUpgradeCost").innerText = Math.floor(goldenBallUpgradeCost);
-            document.getElementById("bucketMultiplierUpgradeCost").innerText = Math.floor(bucketMultiplierUpgradeCost);
-            document.getElementById("magnetUpgradeCost").innerText = Math.floor(magnetUpgradeCost);
-
-            if (autoDropLevel >= 1) document.getElementById("pegBonusUpgradeButton").style.display = "inline";
-            if (autoDropLevel >= 2) document.getElementById("ballLimitUpgradeButton").style.display = "inline";
-            if (autoDropLevel >= 3) document.getElementById("boardSizeUpgradeButton").style.display = "inline";
-            if (gold >= 1000) document.getElementById("prestigeButton").style.display = "inline";
-        }
-
-        function gameLoop() {
-            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-            drawBuckets();
-            balls.forEach(ball => { ball.update(); ball.draw(); });
-            pegs.forEach(peg => peg.draw());
-            requestAnimationFrame(gameLoop);
-        }
-
-        function createPegs() {
-            pegs = [];
-            let offset = 25;
-            for (let i = 50; i < canvasHeight - 100; i += 50) {
-                for (let j = offset; j < canvasWidth - 50; j += 50) {
-                    if (j > 50 && j < canvasWidth - 50) {
-                        pegs.push(new Peg(j, i));
-                    }
-                }
-                offset = offset === 25 ? 0 : 25;
-            }
-        }
-
-        function autoDrop() {
-            if (balls.length < ballLimit) {
-                dropBall();
-            }
-            setTimeout(autoDrop, autoDropInterval);
-        }
-
-        function calculateGoldPerSecond() {
-            if (goldHistory.length >= 10) goldHistory.shift();
-            goldHistory.push(gold);
-            if (goldHistory.length > 1) {
-                goldPerSecond = (goldHistory[goldHistory.length - 1] - goldHistory[0]) / goldHistory.length;
-            }
-            document.getElementById("goldPerSecond").innerText = Math.floor(goldPerSecond);
-            setTimeout(calculateGoldPerSecond, 1000);
-        }
-
-        function startMinigame() {
-            minigameActive = true;
-            document.querySelector(".minigame").style.display = "block";
-            minigameLoop();
-        }
-
-        let minigameObjects = [];
-        class MinigameObject {
-            constructor() {
-                this.x = Math.random() * 400;
-                this.y = 0;
-                this.radius = 20;
-                this.speed = 2 + Math.random() * 3;
-                this.face = ["😀", "😎", "🤪", "👻", "🐱", "🦄"][Math.floor(Math.random() * 6)]; // Silly faces
-            }
-            update() {
-                this.y += this.speed;
-                if (this.y > 400) {
-                    minigameObjects.splice(minigameObjects.indexOf(this), 1);
-                }
-            }
-            draw() {
-                minigameCtx.font = "24px Arial";
-                minigameCtx.textAlign = "center";
-                minigameCtx.fillText(this.face, this.x, this.y); // Draw silly face
-            }
-        }
-
-        function minigameLoop() {
-            if (!minigameActive) return;
-            minigameCtx.clearRect(0, 0, 400, 400);
-            if (Math.random() < 0.05) minigameObjects.push(new MinigameObject());
-            minigameObjects.forEach(obj => { obj.update(); obj.draw(); });
-            requestAnimationFrame(minigameLoop);
-        }
-
-        minigameCanvas.addEventListener("click", (e) => {
-            if (!minigameActive) return;
-            let rect = minigameCanvas.getBoundingClientRect();
-            let x = e.clientX - rect.left;
-            let y = e.clientY - rect.top;
-            minigameObjects.forEach((obj, index) => {
-                let dx = obj.x - x;
-                let dy = obj.y - y;
-                if (Math.sqrt(dx * dx + dy * dy) < obj.radius) {
-                    gold += 50 * globalMultiplier; // Reward for clicking objects
-                    minigameObjects.splice(index, 1);
-                }
-            });
         });
+        
+        // Bucket landing
+        if(ball.y > pachinko.canvasHeight - 50) {
+            const bucket = pachinko.buckets.find(b => ball.x > b.x && ball.x < b.x + b.width);
+            pachinko.actionMultiplier = bucket ? bucket.multiplier : 0;
+            resolveAction();
+        }
+    });
+    
+    drawGame();
+    if(pachinko.balls.length > 0) requestAnimationFrame(gameLoop);
+}
 
-        createBuckets();
-        createPegs();
-        gameLoop();
-        autoDrop();
-        calculateGoldPerSecond();
-    </script>
-</body>
-</html>
-    </script>
+function dropBall() {
+    pachinko.balls = [new Ball()];
+    gameLoop();
+}
+
+function resolveAction() {
+    const action = actions[player.currentAction];
+    let resultText = '';
+    
+    switch(player.currentAction) {
+        case 'chop_wood':
+            const woodGained = Math.round(action.baseYield * pachinko.actionMultiplier);
+            player.wood += woodGained;
+            resultText = `Gained ${woodGained} wood!`;
+            break;
+            
+        case 'mine_ore':
+            const oreGained = Math.round(action.baseYield * pachinko.actionMultiplier);
+            player.ore += oreGained;
+            resultText = `Mined ${oreGained} ore!`;
+            break;
+            
+        case 'fight':
+            const expGained = Math.round(action.baseYield * pachinko.actionMultiplier);
+            player.exp += expGained;
+            resultText = `Gained ${expGained} EXP!`;
+            if(pachinko.actionMultiplier < 1) {
+                player.health -= Math.round(20 * action.risk);
+                resultText += ` Took ${Math.round(20 * action.risk)} damage!`;
+            }
+            break;
+            
+        case 'smelt':
+            if(player.ore >= 5) {
+                const bars = Math.round((player.ore/5) * pachinko.actionMultiplier);
+                player.gold += bars;
+                player.ore = 0;
+                resultText = `Smelted ${bars} gold bars!`;
+            }
+            break;
+            
+        case 'rest':
+            player.health += Math.round(action.baseYield * pachinko.actionMultiplier);
+            if(player.health > 100) player.health = 100;
+            resultText = `Restored ${Math.round(action.baseYield * pachinko.actionMultiplier)} health!`;
+            break;
+    }
+    
+    checkLevelUp();
+    updateUI();
+    document.getElementById('pachinkoResult').innerHTML = resultText;
+    setTimeout(() => {
+        document.getElementById('pachinkoContainer').style.display = 'none';
+        document.getElementById('actions').style.display = 'block';
+    }, 2000);
+}
+
+function checkLevelUp() {
+    if(player.exp >= player.level * 100) {
+        player.level++;
+        player.exp = 0;
+        alert(`Level Up! Reached level ${player.level}!`);
+    }
+}
+
+function updateUI() {
+    document.getElementById('level').textContent = player.level;
+    document.getElementById('exp').textContent = player.exp;
+    document.getElementById('health').textContent = player.health;
+    document.getElementById('wood').textContent = player.wood;
+    document.getElementById('ore').textContent = player.ore;
+    document.getElementById('gold').textContent = player.gold;
+}
+
+// Initial setup for RPG game
+updateUI();
+
+// Pachinko Idle Game Script
+let idleGold = 0;
+let ballValue = 1;
+let pegBonus = 1;
+let ballLimit = 3;
+let autoDropInterval = 1000;
+let autoDropLevel = 0;
+let prestigePoints = 0;
+let globalMultiplier = 1;
+let ballUpgradeCost = 25;
+let pegUpgradeCost = 75;
+let limitUpgradeCost = 50;
+let boardUpgradeCost = 100;
+let autoDropUpgradeCost = 50;
+let goldenBallChance = 0;
+let goldenBallUpgradeCost = 1;
+let bucketMultiplierUpgradeCost = 2;
+let magnetUpgradeCost = 3;
+let bucketMultiplierToggled = false;
+let magnetActive = false;
+let idleBalls = [];
+let idlePegs = [];
+let idleCanvasWidth = 400;
+let idleCanvasHeight = 400;
+let idleBuckets = [];
+let goldPerSecond = 0;
+let goldHistory = [];
+let minigameActive = false;
+
+const idleCanvas = document.getElementById("idlePachinkoCanvas");
+const idleCtx = idleCanvas.getContext("2d");
+const minigameCanvas = document.getElementById("minigameCanvas");
+const minigameCtx = minigameCanvas.getContext("2d");
+
+function createIdleBuckets() {
+    const bucketMultipliers = [2, 1, 0.5, 5, 0, 5, 0.5, 1, 2];
+    const totalWidth = idleCanvasWidth;
+    const bucketWidth = totalWidth / bucketMultipliers.length;
+    idleBuckets = bucketMultipliers.map((multiplier, index) => ({
+        x: index * bucketWidth,
+        width: multiplier === 5 || multiplier === 2 || multiplier === 0 ? bucketWidth * 0.8 : bucketWidth,
+        multiplier: multiplier,
+        color: multiplier === 5 ? "gold" : multiplier === 2 ? "lightgreen" : multiplier === 1 ? "lightblue" : multiplier === 0 ? "gray" : "lightcoral"
+    }));
+}
+
+class IdleBall {
+    constructor(x) {
+        this.x = x;
+        this.y = 0;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = 0;
+        this.radius = 10;
+        this.value = ballValue;
+        this.isGolden = Math.random() < goldenBallChance;
+        this.hitPegs = [];
+        this.combo = 1;
+    }
+    update() {
+        this.vy += 0.1;
+        this.y += this.vy;
+        this.x += this.vx;
+
+        if (magnetActive) {
+            let targetBucket = idleBuckets.reduce((a, b) => a.multiplier > b.multiplier ? a : b);
+            let dx = (targetBucket.x + targetBucket.width / 2) - this.x;
+            this.vx += dx * 0.01;
+        }
+
+        if (this.x - this.radius < 0 || this.x + this.radius > idleCanvasWidth) {
+            this.vx = -this.vx * 0.5;
+        }
+
+        for (let bucket of idleBuckets) {
+            if (this.y + this.radius > idleCanvasHeight - 50 && this.x > bucket.x && this.x < bucket.x + bucket.width) {
+                let bucketCenter = bucket.x + bucket.width / 2;
+                this.vx += (bucketCenter - this.x) * 0.05;
+            }
+        }
+
+        for (let peg of idlePegs) {
+            let dx = peg.x - this.x;
+            let dy = peg.y - this.y;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < this.radius + peg.radius && !this.hitPegs.includes(peg)) {
+                this.vy = -this.vy * 0.5;
+                this.vx += (Math.random() - 0.5) * 1;
+                this.value += Math.floor(pegBonus * this.combo);
+                this.combo += 0.1;
+                this.hitPegs.push(peg);
+            }
+        }
+
+        if (this.y > idleCanvasHeight) {
+            let bucket = idleBuckets.find(b => this.x > b.x && this.x < b.x + b.width);
+            if (bucket) {
+                let multiplier = bucket.multiplier;
+                if (bucketMultiplierToggled) {
+                    if (multiplier === 2 || multiplier === 5) multiplier *= 2;
+                    if (multiplier === 0.5) multiplier /= 2;
+                }
+                idleGold += Math.floor(this.value * multiplier * globalMultiplier * (this.isGolden ? 5 : 1));
+            }
+            idleBalls.splice(idleBalls.indexOf(this), 1);
+            updateIdleUI();
+        }
+    }
+    draw() {
+        idleCtx.beginPath();
+        idleCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        idleCtx.fillStyle = this.isGolden ? "gold" : "blue";
+        idleCtx.fill();
+        idleCtx.closePath();
+        idleCtx.fillStyle = "white";
+        idleCtx.font = "12px Arial";
+        idleCtx.textAlign = "center";
+        idleCtx.fillText(Math.floor(this.value), this.x, this.y + 4);
+    }
+}
+
+class IdlePeg {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 5;
+    }
+    draw() {
+        idleCtx.beginPath();
+        idleCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        idleCtx.fillStyle = "red";
+        idleCtx.fill();
+        idleCtx.closePath();
+    }
+}
+
+function drawIdleBuckets() {
+    idleBuckets.forEach(bucket => {
+        idleCtx.fillStyle = bucket.color;
+        idleCtx.fillRect(bucket.x, idleCanvasHeight - 50, bucket.width, 50);
+        idleCtx.strokeStyle = "black";
+        idleCtx.lineWidth = 2;
+        idleCtx.strokeRect(bucket.x, idleCanvasHeight - 50, bucket.width, 50);
+        idleCtx.fillStyle = "black";
+        idleCtx.font = "16px Arial";
+        idleCtx.textAlign = "center";
+        idleCtx.fillText(bucket.multiplier + "x", bucket.x + bucket.width / 2, idleCanvasHeight - 20);
+    });
+}
+
+function idleDropBall() {
+    if (idleBalls.length < ballLimit) {
+        idleBalls.push(new IdleBall(Math.random() * idleCanvasWidth));
+    }
+}
+
+function upgradeBallValue() {
+    if (idleGold >= ballUpgradeCost) {
+        idleGold -= ballUpgradeCost;
+        ballValue++;
+        ballUpgradeCost = Math.floor(ballUpgradeCost * 1.2);
+        updateIdleUI();
+    }
+}
+
+function upgradeAutoDrop() {
+    if (idleGold >= autoDropUpgradeCost) {
+        idleGold -= autoDropUpgradeCost;
+        autoDropInterval = Math.max(100, autoDropInterval * 0.9);
+        autoDropLevel++;
+        autoDropUpgradeCost = Math.floor(autoDropUpgradeCost * 1.2);
+        updateIdleUI();
+    }
+}
+
+function upgradePegBonus() {
+    if (idleGold >= pegUpgradeCost) {
+        idleGold -= pegUpgradeCost;
+        pegBonus++;
+        pegUpgradeCost = Math.floor(pegUpgradeCost * 1.2);
+        updateIdleUI();
+    }
+}
+
+function upgradeBallLimit() {
+    if (idleGold >= limitUpgradeCost) {
+        idleGold -= limitUpgradeCost;
+        ballLimit++;
+        limitUpgradeCost = Math.floor(limitUpgradeCost * 1.2);
+        updateIdleUI();
+    }
+}
+
+function upgradeBoardSize() {
+    if (idleGold >= boardUpgradeCost) {
+        idleGold -= boardUpgradeCost;
+        idleCanvasWidth += 100;
+        idleCanvasHeight += 100;
+        idleCanvas.width = idleCanvasWidth;
+        idleCanvas.height = idleCanvasHeight;
+        boardUpgradeCost = Math.floor(boardUpgradeCost * 1.5);
+        createIdlePegs();
+        createIdleBuckets();
+        updateIdleUI();
+    }
+}
+
+function prestige() {
+    if (idleGold >= 1000) {
+        prestigePoints += Math.floor(idleGold / 1000);
+        idleGold = 0;
+        ballValue = 1;
+        pegBonus = 1;
+        ballLimit = 3;
+        autoDropInterval = 1000;
+        autoDropLevel = 0;
+        ballUpgradeCost = 25;
+        pegUpgradeCost = 75;
+        limitUpgradeCost = 50;
+        boardUpgradeCost = 100;
+        autoDropUpgradeCost = 50;
+        idleCanvasWidth = 400;
+        idleCanvasHeight = 400;
+        idleCanvas.width = idleCanvasWidth;
+        idleCanvas.height = idleCanvasHeight;
+        createIdlePegs();
+        createIdleBuckets();
+        globalMultiplier += prestigePoints * 0.1;
+        document.querySelector(".prestige-menu").style.display = "block";
+        updateIdleUI();
+    }
+}
+
+function buyGoldenBallUpgrade() {
+    if (prestigePoints >= goldenBallUpgradeCost) {
+        prestigePoints -= goldenBallUpgradeCost;
+        goldenBallChance += 0.01;
+        goldenBallUpgradeCost += 1;
+        updateIdleUI();
+    }
+}
+
+function toggleBucketMultiplier() {
+    if (prestigePoints >= bucketMultiplierUpgradeCost) {
+        prestigePoints -= bucketMultiplierUpgradeCost;
+        bucketMultiplierToggled = !bucketMultiplierToggled;
+        updateIdleUI();
+    }
+}
+
+function buyMagnetUpgrade() {
+    if (prestigePoints >= magnetUpgradeCost) {
+        prestigePoints -= magnetUpgradeCost;
+        magnetActive = true;
+        updateIdleUI();
+    }
+}
+
+function updateIdleUI() {
+    document.getElementById("idleGold").innerText = Math.floor(idleGold);
+    document.getElementById("ballUpgradeCost").innerText = Math.floor(ballUpgradeCost);
+    document.getElementById("autoDropUpgradeCost").innerText = Math.floor(autoDropUpgradeCost);
+    document.getElementById("pegUpgradeCost").innerText = Math.floor(pegUpgradeCost);
+    document.getElementById("limitUpgradeCost").innerText = Math.floor(limitUpgradeCost);
+    document.getElementById("boardUpgradeCost").innerText = Math.floor(boardUpgradeCost);
+    document.getElementById("prestigeBonus").innerText = Math.floor(prestigePoints + (idleGold / 1000));
+    document.getElementById("goldenBallUpgradeCost").innerText = Math.floor(goldenBallUpgradeCost);
+    document.getElementById("bucketMultiplierUpgradeCost").innerText = Math.floor(bucketMultiplierUpgradeCost);
+    document.getElementById("magnetUpgradeCost").innerText = Math.floor(magnetUpgradeCost);
+
+    if (autoDropLevel >= 1) document.getElementById("pegBonusUpgradeButton").style.display = "inline";
+    if (autoDropLevel >= 2) document.getElementById("ballLimitUpgradeButton").style.display = "inline";
+    if (autoDropLevel >= 3) document.getElementById("boardSizeUpgradeButton").style.display = "inline";
+    if (idleGold >= 1000) document.getElementById("prestigeButton").style.display = "inline";
+}
+
+function idleGameLoop() {
+    idleCtx.clearRect(0, 0, idleCanvasWidth, idleCanvasHeight);
+    drawIdleBuckets();
+    idleBalls.forEach(ball => { ball.update(); ball.draw(); });
+    idlePegs.forEach(peg => peg.draw());
+    requestAnimationFrame(idleGameLoop);
+}
+
+function createIdlePegs() {
+    idlePegs = [];
+    let offset = 25;
+    for (let i = 50; i < idleCanvasHeight - 100; i += 50) {
+        for (let j = offset; j < idleCanvasWidth - 50; j += 50) {
+            if (j > 50 && j < idleCanvasWidth - 50) {
+                idlePegs.push(new IdlePeg(j, i));
+            }
+        }
+        offset = offset === 25 ? 0 : 25;
+    }
+}
+
+function autoDrop() {
+    if (idleBalls.length < ballLimit) {
+        idleDropBall();
+    }
+    setTimeout(autoDrop, autoDropInterval);
+}
+
+function calculateGoldPerSecond() {
+    if (goldHistory.length >= 10) goldHistory.shift();
+    goldHistory.push(idleGold);
+    if (goldHistory.length > 1) {
+        goldPerSecond = (goldHistory[goldHistory.length - 1] - goldHistory[0]) / goldHistory.length;
+    }
+    document.getElementById("goldPerSecond").innerText = Math.floor(goldPerSecond);
+    setTimeout(calculateGoldPerSecond, 1000);
+}
+
+function startMinigame() {
+    minigameActive = true;
+    document.querySelector(".minigame").style.display = "block";
+    minigameLoop();
+}
+
+let minigameObjects = [];
+class MinigameObject {
+    constructor() {
+        this.x = Math.random() * 400;
+        this.y = 0;
+        this.radius = 20;
+        this.speed = 2 + Math.random() * 3;
+        this.face = ["😀", "😎", "🤪", "👻", "🐱", "🦄"][Math.floor(Math.random() * 6)];
+    }
+    update() {
+        this.y += this.speed;
+        if (this.y > 400) {
+            minigameObjects.splice(minigameObjects.indexOf(this), 1);
+        }
+    }
+    draw() {
+        minigameCtx.font = "24px Arial";
+        minigameCtx.textAlign = "center";
+        minigameCtx.fillText(this.face, this.x, this.y);
+    }
+}
+
+function minigameLoop() {
+    if (!minigameActive) return;
+    minigameCtx.clearRect(0, 0, 400, 400);
+    if (Math.random() < 0.05) minigameObjects.push(new MinigameObject());
+    minigameObjects.forEach(obj => { obj.update(); obj.draw(); });
+    requestAnimationFrame(minigameLoop);
+}
+
+minigameCanvas.addEventListener("click", (e) => {
+    if (!minigameActive) return;
+    let rect = minigameCanvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+    minigameObjects.forEach((obj, index) => {
+        let dx = obj.x - x;
+        let dy = obj.y - y;
+        if (Math.sqrt(dx * dx + dy * dy) < obj.radius) {
+            idleGold += 50 * globalMultiplier;
+            minigameObjects.splice(index, 1);
+        }
+    });
+});
+
+createIdleBuckets();
+createIdlePegs();
+idleGameLoop();
+autoDrop();
+calculateGoldPerSecond();
+</script>
 </body>
 </html>
