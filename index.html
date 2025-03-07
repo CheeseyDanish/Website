@@ -560,7 +560,7 @@ function upgradeBoardSize() {
         idleCanvasHeight += 100;
         idleCanvas.width = idleCanvasWidth;
         idleCanvas.height = idleCanvasHeight;
-        boardUpgradeCost = Math.floor(boardUpgradeCost^2);
+        boardUpgradeCost = Math.floor(boardUpgradeCost*10);
         createIdlePegs();
         createIdleBuckets();
         updateIdleUI();
@@ -625,6 +625,7 @@ function buyMagnetUpgrade() {
 
 function updateIdleUI() {
     document.getElementById("idleGold").innerText = Math.floor(idleGold);
+    document.getElementById("donateToIsrael").innerText = Math.floor(idleGold);
     document.getElementById("ballUpgradeCost").innerText = Math.floor(ballUpgradeCost);
     document.getElementById("autoDropUpgradeCost").innerText = Math.floor(autoDropUpgradeCost);
     document.getElementById("pegUpgradeCost").innerText = Math.floor(pegUpgradeCost);
