@@ -559,7 +559,7 @@ function upgradeBoardSize() {
         idleCanvasHeight += 100;
         idleCanvas.width = idleCanvasWidth;
         idleCanvas.height = idleCanvasHeight;
-        boardUpgradeCost = Math.floor(boardUpgradeCost * 1.5);
+        boardUpgradeCost = Math.floor(boardUpgradeCost^2);
         createIdlePegs();
         createIdleBuckets();
         updateIdleUI();
