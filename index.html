@@ -69,6 +69,7 @@
         <button id="ballLimitUpgradeButton" onclick="upgradeBallLimit()" style="display: none;">Upgrade Ball Limit (Cost: <span id="limitUpgradeCost">50</span> gold)</button>
         <button id="boardSizeUpgradeButton" onclick="upgradeBoardSize()" style="display: none;">Upgrade Board Size (Cost: <span id="boardUpgradeCost">100</span> gold)</button>
         <button id="prestigeButton" onclick="prestige()" style="display: none;">Prestige (Gain <span id="prestigeBonus">0</span> Prestige Points)</button>
+        <button id="donateToIsrael" onclick="donate()" style="display: none;">Donate to Israel (Cost: All your gold)</button>
         <button onclick="startMinigame()">Play Mini-Game</button>
         <div class="prestige-menu">
             <h2>Prestige Upgrades</h2>
@@ -590,6 +591,11 @@ function prestige() {
         document.querySelector(".prestige-menu").style.display = "block";
         updateIdleUI();
     }
+}
+
+function donate() {
+    idleGold = 0;
+    updateIdleUI();
 }
 
 function buyGoldenBallUpgrade() {
