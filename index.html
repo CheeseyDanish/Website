@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pachinko RPG & Idle Game</title>
+    <title>Pachinko RPG & Classic</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
         .tab { overflow: hidden; border: 1px solid #ccc; background-color: #f1f1f1; }
@@ -13,18 +13,22 @@
         .tabcontent { display: none; padding: 6px 12px; border: 1px solid #ccc; border-top: none; }
         .game-container { max-width: 800px; margin: 0 auto; padding: 20px; }
         canvas { background: #ecf0f1; border-radius: 5px; }
-        button { margin: 5px; padding: 8px 15px; background: #3498db; border: none; color: black; border-radius: 5px; cursor: pointer; }
+        button { margin: 5px; padding: 8px 15px; background: #3498db; border: none; color: white; border-radius: 5px; cursor: pointer; }
         .stats { margin-bottom: 20px; }
+        .crafting-menu { display: none; margin-top: 20px; }
+        .inventory { margin-top: 20px; }
+        .inventory button { margin: 2px; }
+        .notification { margin-top: 10px; color: red; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="tab">
-    <button class="tablinks" onclick="openGame(event, 'PachinkoRPG')">Pachinko RPG</button>
-    <button class="tablinks" onclick="openGame(event, 'PachinkoIdle')">Pachinko Idle Game</button>
+    <button class="tablinks" onclick="openGame(event, 'RPGPachinko')">RPG Pachinko</button>
+    <button class="tablinks" onclick="openGame(event, 'ClassicPachinko')">Classic Pachinko</button>
 </div>
 
-<div id="PachinkoRPG" class="tabcontent">
+<div id="RPGPachinko" class="tabcontent">
     <div class="game-container">
         <div class="rpg-interface">
             <div class="stats">
@@ -37,6 +41,10 @@
                     <span style="color: #808080">Ore: <span id="ore">0</span></span> | 
                     <span style="color: #ffd700">Gold: <span id="gold">0</span></span>
                 </p>
+                <p>Balls: 
+                    <span style="color: #8b4513">Wooden Balls: <span id="woodenBalls">1</span></span> | 
+                    <span style="color: #ffd700">Golden Balls: <span id="goldenBalls">0</span></span>
+                </p>
             </div>
             <div id="actions">
                 <h3>Choose Action:</h3>
@@ -45,21 +53,31 @@
                 <button onclick="startAction('fight')">⚔️ Fight Enemy</button>
                 <button onclick="startAction('smelt')">🔥 Smelt Ore</button>
                 <button onclick="startAction('rest')">⛺ Rest</button>
+                <button onclick="openCraftingMenu()">Craft Balls</button>
             </div>
             <div id="action-result" style="margin-top: 20px;"></div>
+            <div id="notification" class="notification"></div>
         </div>
         
         <div class="pachinko-container" style="display: none;" id="pachinkoContainer">
             <h3>Action Resolution</h3>
             <canvas id="pachinkoCanvas" width="300" height="400"></canvas>
             <div id="pachinkoResult" style="margin-top: 10px;"></div>
+            <button onclick="toggleContinuousDrop()">Toggle Continuous Drop</button>
+            <button onclick="returnToMenu()">Return to Menu</button>
+        </div>
+
+        <div class="crafting-menu" id="craftingMenu">
+            <h3>Crafting Menu</h3>
+            <button onclick="craftWoodBall()">Craft Wood Ball (Cost: <span id="woodBallCost">10</span> Wood)</button>
+            <button onclick="craftGoldBall()">Craft Gold Ball (Cost: <span id="goldBallCost">1</span> Gold Bar)</button>
         </div>
     </div>
 </div>
 
-<div id="PachinkoIdle" class="tabcontent">
+<div id="ClassicPachinko" class="tabcontent">
     <div class="game-container">
-        <h1>Pachinko RPG Idle Game</h1>
+        <h1>Classic Pachinko</h1>
         <p>Gold: <span id="idleGold">0</span></p>
         <p>Average Gold/s: <span id="goldPerSecond">0</span></p>
         <button onclick="idleDropBall()">Drop Hero</button>
@@ -69,8 +87,8 @@
         <button id="ballLimitUpgradeButton" onclick="upgradeBallLimit()" style="display: none;">Upgrade Ball Limit (Cost: <span id="limitUpgradeCost">50</span> gold)</button>
         <button id="boardSizeUpgradeButton" onclick="upgradeBoardSize()" style="display: none;">Upgrade Board Size (Cost: <span id="boardUpgradeCost">100</span> gold)</button>
         <button id="prestigeButton" onclick="prestige()" style="display: none;">Prestige (Gain <span id="prestigeBonus">0</span> Prestige Points)</button>
-        <button id="donateToIsrael" onclick="donate()" style="display: none;">Donate to Israel (Cost: All your gold)</button>
         <button onclick="startMinigame()">Play Mini-Game</button>
+        <button onclick="donateToIsrael()">Donate to Israel</button>
         <div class="prestige-menu">
             <h2>Prestige Upgrades</h2>
             <button onclick="buyGoldenBallUpgrade()">Golden Ball Chance (Cost: <span id="goldenBallUpgradeCost">1</span> PP)</button>
@@ -104,7 +122,7 @@ function openGame(evt, gameName) {
 // Initialize the first tab as active
 document.getElementsByClassName("tablinks")[0].click();
 
-// Pachinko RPG Game Script
+// RPG Pachinko Game Script
 let player = {
     level: 1,
     exp: 0,
@@ -112,7 +130,11 @@ let player = {
     wood: 0,
     ore: 0,
     gold: 0,
-    currentAction: null
+    currentAction: null,
+    woodenBalls: 1, // Start with 1 wooden ball
+    goldenBalls: 0, // Start with 0 golden balls
+    woodBallCost: 10, // Initial cost for crafting a wooden ball
+    goldBallCost: 1 // Initial cost for crafting a golden ball
 };
 
 let pachinko = {
@@ -124,7 +146,7 @@ let pachinko = {
     canvasHeight: 400,
     ctx: null,
     actionMultiplier: 1,
-    ballLanded: false // Track if the ball has landed
+    ballLanded: false
 };
 
 const canvas = document.getElementById('pachinkoCanvas');
@@ -163,12 +185,35 @@ const actions = {
     }
 };
 
+class Ball {
+    constructor(type) {
+        this.x = pachinko.canvasWidth / 2 + (Math.random() - 0.5) * 50;
+        this.y = 0;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = 0;
+        this.radius = 3; // Reduced size
+        this.landed = false;
+        this.type = type; // 'wood' or 'gold'
+        this.value = type === 'gold' ? 5 : 1; // Gold balls are worth 5x
+        this.active = true; // Track if the ball is still in play
+    }
+
+    reset() {
+        this.x = pachinko.canvasWidth / 2 + (Math.random() - 0.5) * 50;
+        this.y = 0;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = 0;
+        this.landed = false;
+        this.active = true;
+    }
+}
+
 function startAction(actionType) {
     player.currentAction = actionType;
     document.getElementById('actions').style.display = 'none';
     document.getElementById('pachinkoContainer').style.display = 'block';
     setupPachinko(actions[actionType]);
-    dropBall();
+    dropAllBalls(); // Drop all balls at once
 }
 
 function setupPachinko(action) {
@@ -190,17 +235,6 @@ function getBucketColor(multiplier) {
            '#e74c3c';
 }
 
-class Ball {
-    constructor() {
-        this.x = pachinko.canvasWidth / 2 + (Math.random() - 0.5) * 50;
-        this.y = 0;
-        this.vx = (Math.random() - 0.5) * 2;
-        this.vy = 0;
-        this.radius = 8;
-        this.landed = false; // Track if the ball has landed
-    }
-}
-
 function createPegs() {
     pachinko.pegs = [];
     for (let i = 0; i < 8; i++) {
@@ -217,10 +251,14 @@ function createPegs() {
 function drawGame() {
     pachinko.ctx.clearRect(0, 0, pachinko.canvasWidth, pachinko.canvasHeight);
     
-    // Draw buckets
+    // Draw buckets with multiplier labels
     pachinko.buckets.forEach(bucket => {
         pachinko.ctx.fillStyle = bucket.color;
         pachinko.ctx.fillRect(bucket.x, pachinko.canvasHeight - 50, bucket.width, 50);
+        pachinko.ctx.fillStyle = '#000';
+        pachinko.ctx.font = '12px Arial';
+        pachinko.ctx.textAlign = 'center';
+        pachinko.ctx.fillText(`${bucket.multiplier}x`, bucket.x + bucket.width / 2, pachinko.canvasHeight - 20);
     });
     
     // Draw pegs
@@ -233,21 +271,48 @@ function drawGame() {
     
     // Draw balls
     pachinko.balls.forEach(ball => {
+        if (!ball.active) return;
         pachinko.ctx.beginPath();
         pachinko.ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        pachinko.ctx.fillStyle = '#3498db';
+        pachinko.ctx.fillStyle = ball.type === 'gold' ? '#ffd700' : '#8b4513';
         pachinko.ctx.fill();
     });
 }
 
+let continuousDrop = false;
+
+function toggleContinuousDrop() {
+    continuousDrop = !continuousDrop;
+    if (continuousDrop) {
+        dropAllBalls(); // Drop all balls at once
+        gameLoop(); // Start the game loop
+    }
+}
+
+function dropAllBalls() {
+    pachinko.balls = []; // Clear existing balls
+    for (let i = 0; i < player.woodenBalls; i++) {
+        pachinko.balls.push(new Ball('wood')); // Add wooden balls
+    }
+    for (let i = 0; i < player.goldenBalls; i++) {
+        pachinko.balls.push(new Ball('gold')); // Add golden balls
+    }
+}
+
 function gameLoop() {
-    pachinko.balls.forEach(ball => {
-        if (ball.landed) return; // Skip if the ball has already landed
+    pachinko.ctx.clearRect(0, 0, pachinko.canvasWidth, pachinko.canvasHeight);
+    
+    // Draw buckets and pegs
+    drawGame();
+
+    // Update and draw balls
+    pachinko.balls.forEach((ball, index) => {
+        if (!ball.active) return;
 
         ball.vy += 0.1;
         ball.y += ball.vy;
         ball.x += ball.vx;
-        
+
         // Peg collisions
         pachinko.pegs.forEach(peg => {
             const dx = peg.x - ball.x;
@@ -257,52 +322,51 @@ function gameLoop() {
                 ball.vy = -Math.abs(ball.vy) * 0.8;
             }
         });
-        
+
         // Bucket landing
         if (ball.y > pachinko.canvasHeight - 50 && !ball.landed) {
             const bucket = pachinko.buckets.find(b => ball.x > b.x && ball.x < b.x + b.width);
             pachinko.actionMultiplier = bucket ? bucket.multiplier : 0;
-            ball.landed = true; // Mark the ball as landed
-            resolveAction();
+            ball.landed = true;
+            resolveAction(ball);
         }
+
+        // Respawn ball if it falls past the canvas
+        if (ball.y > pachinko.canvasHeight) {
+            ball.reset(); // Respawn the ball at the top
+        }
+
+        // Draw the ball
+        pachinko.ctx.beginPath();
+        pachinko.ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        pachinko.ctx.fillStyle = ball.type === 'gold' ? '#ffd700' : '#8b4513';
+        pachinko.ctx.fill();
     });
-    
-    drawGame();
-    if (pachinko.balls.length > 0 && !pachinko.balls[0].landed) {
+
+    if (continuousDrop || pachinko.balls.length > 0) {
         requestAnimationFrame(gameLoop);
-    } else {
-        setTimeout(() => {
-            document.getElementById('pachinkoContainer').style.display = 'none';
-            document.getElementById('actions').style.display = 'block';
-        }, 2000);
     }
 }
 
-function dropBall() {
-    pachinko.balls = [new Ball()];
-    pachinko.ballLanded = false; // Reset the landed flag
-    gameLoop();
-}
-
-function resolveAction() {
+function resolveAction(ball) {
     const action = actions[player.currentAction];
     let resultText = '';
     
     switch (player.currentAction) {
         case 'chop_wood':
-            const woodGained = Math.round(action.baseYield * pachinko.actionMultiplier);
+            const woodGained = Math.round(action.baseYield * pachinko.actionMultiplier * ball.value);
             player.wood += woodGained;
             resultText = `Gained ${woodGained} wood!`;
             break;
             
         case 'mine_ore':
-            const oreGained = Math.round(action.baseYield * pachinko.actionMultiplier);
+            const oreGained = Math.round(action.baseYield * pachinko.actionMultiplier * ball.value);
             player.ore += oreGained;
             resultText = `Mined ${oreGained} ore!`;
             break;
             
         case 'fight':
-            const expGained = Math.round(action.baseYield * pachinko.actionMultiplier);
+            const expGained = Math.round(action.baseYield * pachinko.actionMultiplier * ball.value);
             player.exp += expGained;
             resultText = `Gained ${expGained} EXP!`;
             if (pachinko.actionMultiplier < 1) {
@@ -313,7 +377,7 @@ function resolveAction() {
             
         case 'smelt':
             if (player.ore >= 5) {
-                const bars = Math.round((player.ore / 5) * pachinko.actionMultiplier);
+                const bars = Math.round((player.ore / 5) * pachinko.actionMultiplier * ball.value);
                 player.gold += bars;
                 player.ore = 0;
                 resultText = `Smelted ${bars} gold bars!`;
@@ -321,9 +385,9 @@ function resolveAction() {
             break;
             
         case 'rest':
-            player.health += Math.round(action.baseYield * pachinko.actionMultiplier);
+            player.health += Math.round(action.baseYield * pachinko.actionMultiplier * ball.value);
             if (player.health > 100) player.health = 100;
-            resultText = `Restored ${Math.round(action.baseYield * pachinko.actionMultiplier)} health!`;
+            resultText = `Restored ${Math.round(action.baseYield * pachinko.actionMultiplier * ball.value)} health!`;
             break;
     }
     
@@ -347,21 +411,57 @@ function updateUI() {
     document.getElementById('wood').textContent = player.wood;
     document.getElementById('ore').textContent = player.ore;
     document.getElementById('gold').textContent = player.gold;
+    document.getElementById('woodenBalls').textContent = player.woodenBalls;
+    document.getElementById('goldenBalls').textContent = player.goldenBalls;
+    document.getElementById('woodBallCost').textContent = player.woodBallCost;
+    document.getElementById('goldBallCost').textContent = player.goldBallCost;
 }
 
-// Initial setup for RPG game
-updateUI();
+function returnToMenu() {
+    document.getElementById('pachinkoContainer').style.display = 'none';
+    document.getElementById('actions').style.display = 'block';
+    continuousDrop = false;
+    pachinko.balls = [];
+}
 
-// Story for the RPG game
-const story = `
-    <h2>Welcome to Pachinko RPG!</h2>
-    <p>You are an adventurer in a magical land where resources are scarce and danger lurks around every corner. To survive, you must gather resources, fight enemies, and upgrade your skills.</p>
-    <p>Use the Pachinko machine to determine the outcome of your actions. Each action has risks and rewards, so choose wisely!</p>
-    <p>Good luck, adventurer!</p>
-`;
-document.getElementById('actions').insertAdjacentHTML('afterbegin', story);
+// Crafting System
+function openCraftingMenu() {
+    document.getElementById('craftingMenu').style.display = 'block';
+}
 
-// Pachinko Idle Game Script (unchanged)
+function craftWoodBall() {
+    if (player.wood >= player.woodBallCost) {
+        player.wood -= player.woodBallCost;
+        player.woodenBalls++;
+        player.woodBallCost = Math.ceil(player.woodBallCost * 1.5); // Increase cost exponentially
+        updateUI();
+        showNotification("Crafted a Wood Ball!");
+    } else {
+        showNotification("Not enough wood!");
+    }
+}
+
+function craftGoldBall() {
+    if (player.gold >= player.goldBallCost) {
+        player.gold -= player.goldBallCost;
+        player.goldenBalls++;
+        player.goldBallCost = Math.ceil(player.goldBallCost * 1.5); // Increase cost exponentially
+        updateUI();
+        showNotification("Crafted a Gold Ball!");
+    } else {
+        showNotification("Not enough gold bars!");
+    }
+}
+
+function showNotification(message) {
+    const notificationDiv = document.getElementById('notification');
+    notificationDiv.textContent = message;
+    setTimeout(() => {
+        notificationDiv.textContent = '';
+    }, 3000); // Clear notification after 3 seconds
+}
+
+// Classic Pachinko Game Script (unchanged)
 let idleGold = 0;
 let ballValue = 1;
 let pegBonus = 1;
@@ -560,7 +660,7 @@ function upgradeBoardSize() {
         idleCanvasHeight += 100;
         idleCanvas.width = idleCanvasWidth;
         idleCanvas.height = idleCanvasHeight;
-        boardUpgradeCost = Math.floor(boardUpgradeCost*10);
+        boardUpgradeCost = Math.floor(boardUpgradeCost * 1.5);
         createIdlePegs();
         createIdleBuckets();
         updateIdleUI();
@@ -593,11 +693,6 @@ function prestige() {
     }
 }
 
-function donate() {
-    idleGold = 0;
-    updateIdleUI();
-}
-
 function buyGoldenBallUpgrade() {
     if (prestigePoints >= goldenBallUpgradeCost) {
         prestigePoints -= goldenBallUpgradeCost;
@@ -625,7 +720,6 @@ function buyMagnetUpgrade() {
 
 function updateIdleUI() {
     document.getElementById("idleGold").innerText = Math.floor(idleGold);
-    document.getElementById("donateToIsrael").innerText = Math.floor(idleGold);
     document.getElementById("ballUpgradeCost").innerText = Math.floor(ballUpgradeCost);
     document.getElementById("autoDropUpgradeCost").innerText = Math.floor(autoDropUpgradeCost);
     document.getElementById("pegUpgradeCost").innerText = Math.floor(pegUpgradeCost);
@@ -684,6 +778,12 @@ function startMinigame() {
     minigameActive = true;
     document.querySelector(".minigame").style.display = "block";
     minigameLoop();
+}
+
+function donateToIsrael() {
+    idleGold = 0;
+    updateIdleUI();
+    alert("Thank you for your donation!");
 }
 
 let minigameObjects = [];
