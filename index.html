@@ -122,7 +122,8 @@ let pachinko = {
     canvasWidth: 300,
     canvasHeight: 400,
     ctx: null,
-    actionMultiplier: 1
+    actionMultiplier: 1,
+    ballLanded: false // Track if the ball has landed
 };
 
 const canvas = document.getElementById('pachinkoCanvas');
@@ -190,21 +191,22 @@ function getBucketColor(multiplier) {
 
 class Ball {
     constructor() {
-        this.x = pachinko.canvasWidth/2 + (Math.random()-0.5)*50;
+        this.x = pachinko.canvasWidth / 2 + (Math.random() - 0.5) * 50;
         this.y = 0;
-        this.vx = (Math.random()-0.5)*2;
+        this.vx = (Math.random() - 0.5) * 2;
         this.vy = 0;
         this.radius = 8;
+        this.landed = false; // Track if the ball has landed
     }
 }
 
 function createPegs() {
     pachinko.pegs = [];
-    for(let i=0; i<8; i++) {
-        for(let j=0; j<5; j++) {
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 5; j++) {
             pachinko.pegs.push({
-                x: 50 + i*30 + (j%2)*15,
-                y: 50 + j*40,
+                x: 50 + i * 30 + (j % 2) * 15,
+                y: 50 + j * 40,
                 radius: 4
             });
         }
@@ -217,13 +219,13 @@ function drawGame() {
     // Draw buckets
     pachinko.buckets.forEach(bucket => {
         pachinko.ctx.fillStyle = bucket.color;
-        pachinko.ctx.fillRect(bucket.x, pachinko.canvasHeight-50, bucket.width, 50);
+        pachinko.ctx.fillRect(bucket.x, pachinko.canvasHeight - 50, bucket.width, 50);
     });
     
     // Draw pegs
     pachinko.pegs.forEach(peg => {
         pachinko.ctx.beginPath();
-        pachinko.ctx.arc(peg.x, peg.y, peg.radius, 0, Math.PI*2);
+        pachinko.ctx.arc(peg.x, peg.y, peg.radius, 0, Math.PI * 2);
         pachinko.ctx.fillStyle = '#7f8c8d';
         pachinko.ctx.fill();
     });
@@ -231,7 +233,7 @@ function drawGame() {
     // Draw balls
     pachinko.balls.forEach(ball => {
         pachinko.ctx.beginPath();
-        pachinko.ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
+        pachinko.ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
         pachinko.ctx.fillStyle = '#3498db';
         pachinko.ctx.fill();
     });
@@ -239,6 +241,8 @@ function drawGame() {
 
 function gameLoop() {
     pachinko.balls.forEach(ball => {
+        if (ball.landed) return; // Skip if the ball has already landed
+
         ball.vy += 0.1;
         ball.y += ball.vy;
         ball.x += ball.vx;
@@ -247,26 +251,35 @@ function gameLoop() {
         pachinko.pegs.forEach(peg => {
             const dx = peg.x - ball.x;
             const dy = peg.y - ball.y;
-            if(Math.sqrt(dx*dx + dy*dy) < peg.radius + ball.radius) {
-                ball.vx = (ball.x - peg.x)*0.1;
-                ball.vy = -Math.abs(ball.vy)*0.8;
+            if (Math.sqrt(dx * dx + dy * dy) < peg.radius + ball.radius) {
+                ball.vx = (ball.x - peg.x) * 0.1;
+                ball.vy = -Math.abs(ball.vy) * 0.8;
             }
         });
         
         // Bucket landing
-        if(ball.y > pachinko.canvasHeight - 50) {
+        if (ball.y > pachinko.canvasHeight - 50 && !ball.landed) {
             const bucket = pachinko.buckets.find(b => ball.x > b.x && ball.x < b.x + b.width);
             pachinko.actionMultiplier = bucket ? bucket.multiplier : 0;
+            ball.landed = true; // Mark the ball as landed
             resolveAction();
         }
     });
     
     drawGame();
-    if(pachinko.balls.length > 0) requestAnimationFrame(gameLoop);
+    if (pachinko.balls.length > 0 && !pachinko.balls[0].landed) {
+        requestAnimationFrame(gameLoop);
+    } else {
+        setTimeout(() => {
+            document.getElementById('pachinkoContainer').style.display = 'none';
+            document.getElementById('actions').style.display = 'block';
+        }, 2000);
+    }
 }
 
 function dropBall() {
     pachinko.balls = [new Ball()];
+    pachinko.ballLanded = false; // Reset the landed flag
     gameLoop();
 }
 
@@ -274,7 +287,7 @@ function resolveAction() {
     const action = actions[player.currentAction];
     let resultText = '';
     
-    switch(player.currentAction) {
+    switch (player.currentAction) {
         case 'chop_wood':
             const woodGained = Math.round(action.baseYield * pachinko.actionMultiplier);
             player.wood += woodGained;
@@ -291,15 +304,15 @@ function resolveAction() {
             const expGained = Math.round(action.baseYield * pachinko.actionMultiplier);
             player.exp += expGained;
             resultText = `Gained ${expGained} EXP!`;
-            if(pachinko.actionMultiplier < 1) {
+            if (pachinko.actionMultiplier < 1) {
                 player.health -= Math.round(20 * action.risk);
                 resultText += ` Took ${Math.round(20 * action.risk)} damage!`;
             }
             break;
             
         case 'smelt':
-            if(player.ore >= 5) {
-                const bars = Math.round((player.ore/5) * pachinko.actionMultiplier);
+            if (player.ore >= 5) {
+                const bars = Math.round((player.ore / 5) * pachinko.actionMultiplier);
                 player.gold += bars;
                 player.ore = 0;
                 resultText = `Smelted ${bars} gold bars!`;
@@ -308,7 +321,7 @@ function resolveAction() {
             
         case 'rest':
             player.health += Math.round(action.baseYield * pachinko.actionMultiplier);
-            if(player.health > 100) player.health = 100;
+            if (player.health > 100) player.health = 100;
             resultText = `Restored ${Math.round(action.baseYield * pachinko.actionMultiplier)} health!`;
             break;
     }
@@ -316,14 +329,10 @@ function resolveAction() {
     checkLevelUp();
     updateUI();
     document.getElementById('pachinkoResult').innerHTML = resultText;
-    setTimeout(() => {
-        document.getElementById('pachinkoContainer').style.display = 'none';
-        document.getElementById('actions').style.display = 'block';
-    }, 2000);
 }
 
 function checkLevelUp() {
-    if(player.exp >= player.level * 100) {
+    if (player.exp >= player.level * 100) {
         player.level++;
         player.exp = 0;
         alert(`Level Up! Reached level ${player.level}!`);
@@ -342,7 +351,16 @@ function updateUI() {
 // Initial setup for RPG game
 updateUI();
 
-// Pachinko Idle Game Script
+// Story for the RPG game
+const story = `
+    <h2>Welcome to Pachinko RPG!</h2>
+    <p>You are an adventurer in a magical land where resources are scarce and danger lurks around every corner. To survive, you must gather resources, fight enemies, and upgrade your skills.</p>
+    <p>Use the Pachinko machine to determine the outcome of your actions. Each action has risks and rewards, so choose wisely!</p>
+    <p>Good luck, adventurer!</p>
+`;
+document.getElementById('actions').insertAdjacentHTML('afterbegin', story);
+
+// Pachinko Idle Game Script (unchanged)
 let idleGold = 0;
 let ballValue = 1;
 let pegBonus = 1;
