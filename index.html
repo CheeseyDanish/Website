@@ -7,7 +7,7 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
         .tab { overflow: hidden; border: 1px solid #ccc; background-color: #f1f1f1; }
-        .tab button { background-color: inherit; float: left; border: none; outline: black; cursor: pointer; padding: 14px 16px; transition: 0.3s; font-size: 17px; }
+        .tab button { background-color: inherit; float: left; border: none; outline: black; cursor: pointer; padding: 14px 16px; transition: 0.3s; font-size: 17px; font-color: black; }
         .tab button:hover { background-color: #ddd; }
         .tab button.active { background-color: #ccc; }
         .tabcontent { display: none; padding: 6px 12px; border: 1px solid #ccc; border-top: none; }
@@ -50,8 +50,8 @@
                 <h3>Choose Action:</h3>
                 <button onclick="startAction('chop_wood')">🪓 Chop Wood</button>
                 <button onclick="startAction('mine_ore')">⛏️ Mine Ore</button>
-                <button onclick="startAction('fight')">⚔️ Fight Enemy</button>
                 <button onclick="startAction('smelt')">🔥 Smelt Ore</button>
+                <button onclick="startAction('fight')">⚔️ Fight Enemy</button>
                 <button onclick="startAction('rest')">⛺ Rest</button>
                 <button onclick="openCraftingMenu()">Craft Balls</button>
             </div>
@@ -279,10 +279,10 @@ function drawGame() {
     });
 }
 
-let continuousDrop = true;
+let continuousDrop = false;
 
 function toggleContinuousDrop() {
-    //continuousDrop = !continuousDrop;
+    continuousDrop = !continuousDrop;
     if (continuousDrop) {
         dropAllBalls(); // Drop all balls at once
         gameLoop(); // Start the game loop
