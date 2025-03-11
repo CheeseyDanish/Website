@@ -7,7 +7,7 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
         .tab { overflow: hidden; border: 1px solid #ccc; background-color: #f1f1f1; }
-        .tab button { background-color: inherit; float: left; border: none; outline: none; cursor: pointer; padding: 14px 16px; transition: 0.3s; font-size: 17px; }
+        .tab button { background-color: inherit; float: left; border: none; outline: black; cursor: pointer; padding: 14px 16px; transition: 0.3s; font-size: 17px; }
         .tab button:hover { background-color: #ddd; }
         .tab button.active { background-color: #ccc; }
         .tabcontent { display: none; padding: 6px 12px; border: 1px solid #ccc; border-top: none; }
@@ -63,7 +63,7 @@
             <h3>Action Resolution</h3>
             <canvas id="pachinkoCanvas" width="300" height="400"></canvas>
             <div id="pachinkoResult" style="margin-top: 10px;"></div>
-            <button onclick="toggleContinuousDrop()">Toggle Continuous Drop</button>
+            <button onclick="toggleContinuousDrop()">Drop</button>
             <button onclick="returnToMenu()">Return to Menu</button>
         </div>
 
@@ -156,19 +156,19 @@ const actions = {
     chop_wood: {
         name: "Wood Chopping",
         buckets: [0.5, 1, 2, 3, 2, 1, 0.5],
-        baseYield: 5,
+        baseYield: 1,
         risk: 0.1
     },
     mine_ore: {
         name: "Mining",
         buckets: [0.3, 0.7, 1.5, 2, 1.5, 0.7, 0.3],
-        baseYield: 3,
+        baseYield: 1,
         risk: 0.2
     },
     fight: {
         name: "Combat",
-        buckets: [0, 1, 1.5, 2, 1.5, 1, 0],
-        baseYield: 20,
+        buckets: [0, 1, 2, 5, 2, 1, 0],
+        baseYield: 5,
         risk: 0.3
     },
     smelt: {
@@ -194,7 +194,7 @@ class Ball {
         this.radius = 3; // Reduced size
         this.landed = false;
         this.type = type; // 'wood' or 'gold'
-        this.value = type === 'gold' ? 5 : 1; // Gold balls are worth 5x
+        this.value = type === 'gold' ? 3 : 1; // Gold balls are worth 3x
         this.active = true; // Track if the ball is still in play
     }
 
@@ -279,10 +279,10 @@ function drawGame() {
     });
 }
 
-let continuousDrop = false;
+let continuousDrop = true;
 
 function toggleContinuousDrop() {
-    continuousDrop = !continuousDrop;
+    //continuousDrop = !continuousDrop;
     if (continuousDrop) {
         dropAllBalls(); // Drop all balls at once
         gameLoop(); // Start the game loop
@@ -364,6 +364,16 @@ function resolveAction(ball) {
             player.ore += oreGained;
             resultText = `Mined ${oreGained} ore!`;
             break;
+
+         case 'smelt':
+            if (player.ore >= 5) {
+                const bars = Math.round((player.ore / 5) * pachinko.actionMultiplier * ball.value);
+                player.gold += bars;
+                player.ore = 0;
+                resultText = `Smelted ${bars} gold bars!`;
+            }
+            break;
+            
             
         case 'fight':
             const expGained = Math.round(action.baseYield * pachinko.actionMultiplier * ball.value);
@@ -375,15 +385,7 @@ function resolveAction(ball) {
             }
             break;
             
-        case 'smelt':
-            if (player.ore >= 5) {
-                const bars = Math.round((player.ore / 5) * pachinko.actionMultiplier * ball.value);
-                player.gold += bars;
-                player.ore = 0;
-                resultText = `Smelted ${bars} gold bars!`;
-            }
-            break;
-            
+       
         case 'rest':
             player.health += Math.round(action.baseYield * pachinko.actionMultiplier * ball.value);
             if (player.health > 100) player.health = 100;
@@ -400,7 +402,8 @@ function checkLevelUp() {
     if (player.exp >= player.level * 100) {
         player.level++;
         player.exp = 0;
-        alert(`Level Up! Reached level ${player.level}!`);
+        updateUI();
+        showNotification(`Level Up! Reached level ${player.level}!`);
     }
 }
 
