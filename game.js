@@ -19,10 +19,18 @@ function updateStats() {
 
 function log(message) {
     const logDiv = document.getElementById('log');
-    logDiv.innerHTML += `<div>${message}</div>`;
-    logDiv.scrollTop = logDiv.scrollHeight;
+    // Add new message
+    logDiv.innerHTML = `<div>${message}</div>` + logDiv.innerHTML;
+    
+    // Limit to 20 messages
+    const messages = logDiv.children;
+    if (messages.length > 20) {
+        logDiv.removeChild(messages[messages.length - 1]);
+    }
+    
+    // Auto-scroll to top
+    logDiv.scrollTop = 0;
 }
-
 function train() {
     if (player.hp <= 10) {
         log("Your monster is too tired to train!");
