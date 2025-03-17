@@ -10,10 +10,25 @@ body {
 }
 
 #game {
+    display: flex;
     border: 3px solid #fff;
     padding: 20px;
     background-color: #1a1a1a;
-    max-width: 600px;
+    max-width: 800px;
+    width: 100%;
+}
+
+#game-content {
+    flex: 2;
+    padding-right: 20px;
+}
+
+#log {
+    flex: 1;
+    border-left: 2px solid white;
+    padding-left: 20px;
+    height: 400px;
+    overflow-y: auto;
 }
 
 button {
@@ -30,8 +45,10 @@ button:hover {
     background-color: #666;
 }
 
-#log {
-    margin-top: 20px;
-    border-top: 2px solid white;
-    padding: 10px;
+#stats {
+    margin-bottom: 20px;
+}
+
+#actions, #shop {
+    margin-bottom: 20px;
 }
