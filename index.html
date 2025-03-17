@@ -6,26 +6,28 @@
 </head>
 <body>
     <div id="game">
-        <h1>🔥 Monster Tamer 🔥</h1>
-        <div id="stats">
-            <h2>Your Monster</h2>
-            <p>Level: <span id="level">1</span></p>
-            <p>HP: <span id="hp">100</span>/<span id="maxHp">100</span></p>
-            <p>Attack: <span id="attack">10</span></p>
-            <p>Defense: <span id="defense">5</span></p>
-            <p>Coins: 💰<span id="coins">50</span></p>
-        </div>
+        <div id="game-content">
+            <h1>🔥 Monster Tamer 🔥</h1>
+            <div id="stats">
+                <h2>Your Monster</h2>
+                <p>Level: <span id="level">1</span></p>
+                <p>HP: <span id="hp">100</span>/<span id="maxHp">100</span></p>
+                <p>Attack: <span id="attack">10</span></p>
+                <p>Defense: <span id="defense">5</span></p>
+                <p>Coins: 💰<span id="coins">50</span></p>
+            </div>
 
-        <div id="actions">
-            <button onclick="train()">Train 🏋️</button>
-            <button onclick="battle()">Battle ⚔️</button>
-            <button onclick="heal()">Heal 🥼</button>
-        </div>
+            <div id="actions">
+                <button onclick="train()">Train 🏋️</button>
+                <button onclick="battle()">Battle ⚔️</button>
+                <button onclick="heal()">Heal 🥼</button>
+            </div>
 
-        <div id="shop">
-            <h3>Shop</h3>
-            <button onclick="buyPotion()">Potion (💰20) +20HP</button>
-            <button onclick="buyAttackBoost()">Attack Boost (💰30)</button>
+            <div id="shop">
+                <h3>Shop</h3>
+                <button onclick="buyPotion()">Potion (💰20) +20HP</button>
+                <button onclick="buyAttackBoost()">Attack Boost (💰30)</button>
+            </div>
         </div>
 
         <div id="log"></div>
