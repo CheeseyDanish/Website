@@ -1,26 +1,23 @@
-// Dark Mode Toggle
+// Set dark mode by default
+document.body.classList.add('dark-mode');
+
+// Theme Toggle
 const themeToggle = document.getElementById('theme-toggle');
 themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
-    themeToggle.querySelector('i').classList.toggle('fa-sun');
+    const icon = themeToggle.querySelector('i');
+    icon.classList.toggle('fa-moon');
+    icon.classList.toggle('fa-sun');
+    
+    // Save preference to localStorage
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', isDarkMode);
 });
 
-// Scroll Animations
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if(entry.isIntersecting) {
-            entry.target.classList.add('animate');
-            if(entry.target.classList.contains('skill-progress')) {
-                const width = entry.target.dataset.width;
-                entry.target.style.width = width;
-            }
-        }
-    });
-});
-
-document.querySelectorAll('.skill-progress').forEach((el) => {
-    observer.observe(el);
-});
-// Initialize game
-updateStats();
-log("Welcome to Monster Tamer! Start training and battling!");
+// Check for saved theme preference
+const savedTheme = localStorage.getItem('darkMode');
+if (savedTheme === 'false') {
+    document.body.classList.remove('dark-mode');
+    themeToggle.querySelector('i').classList.remove('fa-sun');
+    themeToggle.querySelector('i').classList.add('fa-moon');
+}
