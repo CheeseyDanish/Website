@@ -1,38 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Monster Tamer</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andrew Simon | CS Portfolio</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Space+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="game">
-        <div id="game-content">
-            <h1>🔥 Monster Tamer 🔥</h1>
-            <div id="stats">
-                <h2>Your Monster</h2>
-                <p>Level: <span id="level">1</span></p>
-                <p>HP: <span id="hp">100</span>/<span id="maxHp">100</span></p>
-                <p>Attack: <span id="attack">10</span></p>
-                <p>Defense: <span id="defense">5</span></p>
-                <p>Coins: 💰<span id="coins">50</span></p>
+    <header class="hero">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span class="logo">{AS}</span>
+                <button id="theme-toggle" class="theme-btn">
+                    <i class="fas fa-moon"></i>
+                </button>
             </div>
+            <ul class="nav-links">
+                <li><a href="#education">Education</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
 
-            <div id="actions">
-                <button onclick="train()">Train 🏋️</button>
-                <button onclick="battle()">Battle ⚔️</button>
-                <button onclick="heal()">Heal 🥼</button>
-            </div>
-
-            <div id="shop">
-                <h3>Shop</h3>
-                <button onclick="buyPotion()">Potion (💰20) +20HP</button>
-                <button onclick="buyAttackBoost()">Attack Boost (💰30)</button>
+        <div class="hero-content">
+            <h1 class="animate-slide-up">Andrew Simon</h1>
+            <p class="subtitle animate-slide-up delay-1">B.Sc. Computer Science & IT Specialist</p>
+            <div class="cta-container animate-fade-in delay-2">
+                <a href="#contact" class="cta-btn">Hire Me</a>
+                <a href="assets/resume.pdf" download class="cta-btn outline">Download CV</a>
             </div>
         </div>
+    </header>
 
-        <div id="log"></div>
-    </div>
+    <main>
+        <!-- Education Section -->
+        <section id="education" class="section">
+            <h2 class="section-title">Education</h2>
+            <div class="card-grid">
+                <!-- Education Cards -->
+            </div>
+        </section>
 
-    <script src="game.js"></script>
+        <!-- Experience Section -->
+        <section id="experience" class="section dark-bg">
+            <h2 class="section-title">Experience</h2>
+            <div class="timeline">
+                <!-- Timeline Items -->
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="section">
+            <h2 class="section-title">Technical Arsenal</h2>
+            <div class="skills-container">
+                <!-- Skill Bars -->
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section dark-bg">
+            <h2 class="section-title">Get in Touch</h2>
+            <div class="contact-grid">
+                <!-- Contact Form & Info -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <!-- Social Links -->
+    </footer>
+
+    <script src="js/script.js"></script>
 </body>
 </html>
