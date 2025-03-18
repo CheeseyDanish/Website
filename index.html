@@ -9,13 +9,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Space+Mono&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="dark-mode">
     <header class="hero">
         <nav class="navbar">
             <div class="nav-brand">
                 <span class="logo">{AS}</span>
                 <button id="theme-toggle" class="theme-btn">
-                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
                 </button>
             </div>
             <ul class="nav-links">
@@ -41,8 +41,29 @@
         <section id="education" class="section">
             <h2 class="section-title">Education</h2>
             <div class="card-grid">
-                <!-- Education Cards -->
-                <h1 class="section-title">SEX</h1>
+                <div class="card">
+                    <h3>University of Windsor</h3>
+                    <p class="date">2020 - 2024</p>
+                    <p class="description">
+                        Pursuing Bachelor of Computer Science with Honors, focusing on software development
+                        and network systems design. Key coursework includes advanced algorithms, distributed
+                        systems, and machine learning fundamentals.
+                    </p>
+                    <!--
+                    <ul class="achievements">
+                        <li>Dean's List - 3 Semesters</li>
+                        <li>Capstone Project: AI-Powered Network Optimization</li>
+                    </ul>
+                    -->
+                </div>
+                <div class="card">
+                    <h3>Google IT Certificate</h3>
+                    <p class="date">Completed May 2022</p>
+                    <p class="description">
+                        Comprehensive IT certification covering system administration, network troubleshooting,
+                        and Linux/CLI expertise. Hands-on experience with enterprise-level IT infrastructure.
+                    </p>
+                </div>
             </div>
         </section>
 
@@ -50,7 +71,22 @@
         <section id="experience" class="section dark-bg">
             <h2 class="section-title">Experience</h2>
             <div class="timeline">
-                <!-- Timeline Items -->
+                <div class="timeline-item">
+                    <h3>AI Writing Evaluator</h3>
+                    <p class="date">May 2024 - Jul 2024</p>
+                    <p class="description">
+                        Evaluated and improved AI-generated content quality at Outlier, working closely with
+                        NLP algorithms and machine learning models to enhance writing mechanics.
+                    </p>
+                </div>
+                <div class="timeline-item">
+                    <h3>IT Support Co-op</h3>
+                    <p class="date">Jan 2020 - Apr 2020</p>
+                    <p class="description">
+                        Provided technical support and system optimization at SX Communications, implementing
+                        new strategies for service efficiency and hardware/software troubleshooting.
+                    </p>
+                </div>
             </div>
         </section>
 
@@ -58,7 +94,19 @@
         <section id="skills" class="section">
             <h2 class="section-title">Technical Arsenal</h2>
             <div class="skills-container">
-                <!-- Skill Bars -->
+                <div class="skill">
+                    <h4>Python</h4>
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-width="90%"></div>
+                    </div>
+                </div>
+                <div class="skill">
+                    <h4>JavaScript</h4>
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-width="85%"></div>
+                    </div>
+                </div>
+                <!-- Add more skills as needed -->
             </div>
         </section>
 
@@ -66,13 +114,37 @@
         <section id="contact" class="section dark-bg">
             <h2 class="section-title">Get in Touch</h2>
             <div class="contact-grid">
-                <!-- Contact Form & Info -->
+                <div class="contact-info">
+                    <h3>Let's Connect</h3>
+                    <p>
+                        I'm always open to discussing new projects, creative ideas, or opportunities
+                        to be part of your team. Feel free to reach out through any of these channels:
+                    </p>
+                    <ul class="contact-list">
+                        <li><i class="fas fa-envelope"></i> andrewsimon2918@gmail.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (226) 344-2958</li>
+                        <li><i class="fab fa-linkedin"></i> linkedin.com/in/andrewsimon</li>
+                    </ul>
+                </div>
+                <!--
+                <form class="contact-form">
+                    <input type="text" placeholder="Your Name" required>
+                    <input type="email" placeholder="Your Email" required>
+                    <textarea placeholder="Your Message" required></textarea>
+                    <button type="submit">Send Message</button>
+                </form>
+                -->
             </div>
         </section>
     </main>
 
     <footer class="footer">
-        <!-- Social Links -->
+        <p>&copy; 2024 Andrew Simon. All rights reserved.</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fas fa-envelope"></i></a>
+        </div>
     </footer>
 
     <script src="js/script.js"></script>
