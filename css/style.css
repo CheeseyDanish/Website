@@ -1,0 +1,104 @@
+:root {
+    --primary: #2A5D84;
+    --secondary: #4B8BBE;
+    --text: #333;
+    --bg-light: #f8f9fa;
+    --bg-dark: #1a1a1a;
+    --card-bg: #ffffff;
+    --transition: all 0.3s ease;
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    line-height: 1.6;
+    background-color: var(--bg-light);
+    transition: var(--transition);
+}
+
+.dark-mode {
+    --text: #f8f9fa;
+    --bg-light: #1a1a1a;
+    --card-bg: #2d2d2d;
+    background-color: var(--bg-dark);
+}
+
+/* Navigation */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem 5%;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+.dark-mode .navbar {
+    background: rgba(26, 26, 26, 0.95);
+}
+
+/* Hero Section */
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 5%;
+}
+
+/* Card Grid */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Skill Bars */
+.skill-bar {
+    margin: 1rem 0;
+    background: #eee;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.skill-progress {
+    height: 15px;
+    background: var(--primary);
+    width: 0;
+    transition: width 1s ease-in-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+    }
+    
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+}
