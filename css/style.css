@@ -10,11 +10,40 @@
     --transition: all 0.3s ease;
 }
 
+/* Dark Mode by Default */
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+    transition: var(--transition);
+}
+
+/* Light Mode Overrides */
+body:not(.dark-mode) {
+    background-color: var(--bg-light);
+    color: var(--text-light);
+}
+
+/* Ensure all sections inherit the background color */
+section {
+    background-color: inherit; /* Inherits from body */
+    color: inherit;           /* Inherits from body */
+}
+
 /* Cards */
 .card {
     background: var(--card-bg);
     color: var(--text);
     transition: var(--transition);
+}
+
+/* Dark Mode Card Background */
+body.dark-mode .card {
+    background: var(--card-bg-dark);
+}
+
+/* Light Mode Card Background */
+body:not(.dark-mode) .card {
+    background: var(--card-bg-light);
 }
 
 /* Skill Bars */
@@ -28,28 +57,19 @@
 
 /* Contact List */
 .contact-list li {
-    color: var(--text);
+    color: inherit; /* Inherits from body */
 }
 
 /* Hero Section */
 .hero {
-    background: var(--bg-dark);
-    color: var(--text-dark);
-}
-
-.dark-mode .hero {
-    background: var(--bg-dark);
-}
-
-body:not(.dark-mode) .hero {
-    background: var(--bg-light);
-    color: var(--text-light);
+    background: inherit; /* Inherits from body */
+    color: inherit;     /* Inherits from body */
 }
 
 /* Footer */
 .footer {
-    background: var(--bg-dark);
-    color: var(--text-dark);
+    background: inherit; /* Inherits from body */
+    color: inherit;     /* Inherits from body */
 }
 
 .dark-mode .footer {
