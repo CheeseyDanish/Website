@@ -1,8 +1,8 @@
 :root {
     --primary: #4B8BBE;       /* Primary accent color */
     --secondary: #2A5D84;     /* Secondary accent color */
-    --text-light: #F8F8FF; /* Ghost white for dark mode text */
-    --text-dark: #2F4F4F;  /* Dark slate gray for light mode text */
+    --text-light: #2F4F4F; /* Ghost white for dark mode text */
+    --text-dark: #F8F8FF;  /* Dark slate gray for light mode text */
     --bg-light: #FFFFFF;      /* White background for light mode */
     --bg-dark: #000000;       /* Black background for dark mode */
     --card-bg-light: #FFFFFF; /* White card background for light mode */
