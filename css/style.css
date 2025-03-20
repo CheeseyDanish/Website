@@ -1,25 +1,73 @@
 :root {
-    --primary: #4B8BBE;
-    --secondary: #2A5D84;
-    --text: #f8f9fa;
-    --bg-light: #FFFFFF;
-    --bg-dark: #000000;
-    --card-bg: #2d2d2d;
+    --primary: #4B8BBE;       /* Primary accent color */
+    --secondary: #2A5D84;     /* Secondary accent color */
+    --text-light: #000000;    /* Black text for light mode */
+    --text-dark: #FFFFFF;     /* White text for dark mode */
+    --bg-light: #FFFFFF;      /* White background for light mode */
+    --bg-dark: #000000;       /* Black background for dark mode */
+    --card-bg-light: #FFFFFF; /* White card background for light mode */
+    --card-bg-dark: #2d2d2d;  /* Dark gray card background for dark mode */
     --transition: all 0.3s ease;
 }
 
-/* Dark Mode by Default */
-body {a
-    background-color: var(--bg-dark);
+/* Cards */
+.card {
+    background: var(--card-bg);
+    color: var(--text);
+    transition: var(--transition);
+}
+
+/* Skill Bars */
+.skill-bar {
+    background: rgba(0, 0, 0, 0.1); /* Light gray background for skill bars */
+}
+
+.dark-mode .skill-bar {
+    background: rgba(255, 255, 255, 0.1); /* Dark gray background for skill bars */
+}
+
+/* Contact List */
+.contact-list li {
     color: var(--text);
 }
 
-/* Light Mode Overrides */
+/* Hero Section */
+.hero {
+    background: var(--bg-dark);
+    color: var(--text-dark);
+}
+
+.dark-mode .hero {
+    background: var(--bg-dark);
+}
+
+body:not(.dark-mode) .hero {
+    background: var(--bg-light);
+    color: var(--text-light);
+}
+
+/* Footer */
+.footer {
+    background: var(--bg-dark);
+    color: var(--text-dark);
+}
+
+.dark-mode .footer {
+    background: var(--bg-dark);
+}
+
+body:not(.dark-mode) .footer {
+    background: var(--bg-light);
+    color: var(--text-light);
+}
+
+/* Ensure text color inverts with the theme */
+body.dark-mode {
+    color: var(--text-dark);
+}
+
 body:not(.dark-mode) {
-    --text: #333;
-    --bg-light: #f8f9fa;
-    --bg-dark: #ffffff;
-    --card-bg: #ffffff;
+    color: var(--text-light);
 }
 
 /* Add these new styles for sample content */
