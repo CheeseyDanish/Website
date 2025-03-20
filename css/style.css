@@ -2,8 +2,8 @@
     --primary: #4B8BBE;
     --secondary: #2A5D84;
     --text: #f8f9fa;
-    --bg-light: #1a1a1a;
-    --bg-dark: #FFFFFF;
+    --bg-light: #FFFFFF;
+    --bg-dark: #000000;
     --card-bg: #2d2d2d;
     --transition: all 0.3s ease;
 }
