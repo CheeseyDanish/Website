@@ -3,8 +3,8 @@
     --secondary: #2A5D84;     /* Secondary accent color */
     --text-light: #000000;    /* Black text for light mode */
     --text-dark: #FFFFFF;     /* White text for dark mode */
-  --text-light: #F8F8FF; /* Ghost white for dark mode text */
-  --text-dark: #2F4F4F;  /* Dark slate gray for light mode text */
+    --text-light: #F8F8FF; /* Ghost white for dark mode text */
+    --text-dark: #2F4F4F;  /* Dark slate gray for light mode text */
     --card-bg-light: #FFFFFF; /* White card background for light mode */
     --card-bg-dark: #2d2d2d;  /* Dark gray card background for dark mode */
     --transition: all 0.3s ease;
