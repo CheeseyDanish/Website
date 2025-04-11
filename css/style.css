@@ -1,9 +1,9 @@
 :root {
     --primary: #4B8BBE;       /* Primary accent color */
     --secondary: #2A5D84;     /* Secondary accent color */
-    --text-light: #2F4F4F; /* Ghost white for dark mode text */
-    --text-dark: #F8F8FF;  /* Dark slate gray for light mode text */
-    --bg-light: #FFFFFF;      /* White background for light mode */
+    --text-light: #056d6d; /* Teal for dark mode text */
+    --text-dark: #af4304;  /* Dark slate gray for light mode text */
+    --bg-light: #ffffff;      /* White background for light mode */
     --bg-dark: #000000;       /* Black background for dark mode */
     --card-bg-light: #FFFFFF; /* White card background for light mode */
     --card-bg-dark: #2d2d2d;  /* Dark gray card background for dark mode */
@@ -27,6 +27,7 @@ body:not(.dark-mode) {
 section {
     background-color: inherit; /* Inherits from body */
     color: inherit;           /* Inherits from body */
+    padding-left: 5rem; /* pads the text away from the left */
 }
 
 /* Cards */
@@ -38,7 +39,7 @@ section {
 
 /* Dark Mode Card Background */
 body.dark-mode .card {
-    background: var(--card-bg-dark);
+    background: inherit;
 }
 
 /* Light Mode Card Background */
@@ -48,7 +49,7 @@ body:not(.dark-mode) .card {
 
 /* Skill Bars */
 .skill-bar {
-    background: rgba(0, 0, 0, 0.1); /* Light gray background for skill bars */
+    background: rgba(0, 0, 0, 0); /* Black background for skill bars */
 }
 
 .dark-mode .skill-bar {
@@ -57,19 +58,22 @@ body:not(.dark-mode) .card {
 
 /* Contact List */
 .contact-list li {
-    color: inherit; /* Inherits from body */
+    color: var(--text-light);
 }
 
 /* Hero Section */
 .hero {
     background: inherit; /* Inherits from body */
-    color: inherit;     /* Inherits from body */
+    color: var(--text-dark);     /* changes to an Orange */
+    text-align: center; /*centers text */
+    font-size: larger;
 }
 
 /* Footer */
 .footer {
     background: inherit; /* Inherits from body */
     color: inherit;     /* Inherits from body */
+    text-align: center;
 }
 
 .dark-mode .footer {
@@ -92,9 +96,9 @@ body:not(.dark-mode) {
 
 /* Add these new styles for sample content */
 .description {
-    margin: 1rem 0;
+    margin: 1rem;
     line-height: 1.8;
-    color: var(--text);
+    color: var(--text-light);
     opacity: 0.9;
 }
 
@@ -104,6 +108,7 @@ body:not(.dark-mode) {
     margin: 0.5rem 0;
 }
 
+/*
 .achievements {
     margin-top: 1rem;
     padding-left: 1.5rem;
@@ -120,7 +125,7 @@ body:not(.dark-mode) {
     left: -1rem;
     color: var(--primary);
 }
-
+*/
 .contact-list {
     list-style: none;
     margin-top: 1rem;
