@@ -20,4 +20,3 @@ if (savedTheme === 'false') {
     themeToggle.querySelector('i').classList.remove('fa-sun');
     themeToggle.querySelector('i').classList.add('fa-moon');
 }
-
