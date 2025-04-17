@@ -13,6 +13,47 @@ themeToggle.addEventListener('click', () => {
     localStorage.setItem('darkMode', isDarkMode);
 });
 
+let engineInstance;
+
+tsParticles.load("hero-bg", {
+  fullScreen: { enable: false },
+  particles: {
+    number: { value: 60 },
+    color: { value: "#ffffff" },
+    shape: { type: "circle" },
+    opacity: { value: 0.3 },
+    size: { value: 3 },
+    move: { enable: true, speed: 1.5 },
+    links: {
+      enable: true,
+      distance: 130,
+      color: "#ffffff",
+      opacity: 0.3,
+      width: 1
+    }
+  },
+  interactivity: {
+    events: {
+      onHover: { enable: true, mode: "repulse" }
+    },
+    modes: {
+      repulse: { distance: 100 },
+      manual: {}
+    }
+  },
+  background: { color: "#0f2027" }
+}).then((engine) => {
+  engineInstance = engine;
+
+  window.addEventListener("scroll", () => {
+    const scrollY = window.scrollY;
+    const offset = scrollY * 0.1; // Change multiplier for stronger/weaker effect
+    engine.canvas.element.style.transform = `translateY(${offset}px)`;
+  });
+});
+
+
+
 // Check for saved theme preference
 const savedTheme = localStorage.getItem('dark-mode');
 if (savedTheme === 'false') {
