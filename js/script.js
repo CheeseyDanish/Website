@@ -45,11 +45,6 @@ tsParticles.load("hero-bg", {
 }).then((engine) => {
   engineInstance = engine;
 
-  window.addEventListener("scroll", () => {
-    const scrollY = window.scrollY;
-    const offset = scrollY * 0.1; // Change multiplier for stronger/weaker effect
-    engine.canvas.element.style.transform = `translateY(${offset}px)`;
-  });
 });
 
 
