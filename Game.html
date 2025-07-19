@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andrew Simon | Brick Breaker Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+
+</head>
+
+<body class="dark-mode"> <!-- Hero Section -->
+<main>
+    <!-- Brick Breaker -->
+    <section id="game" class="section">
+        <h2 class="section-title">Game</h2>
+        <div class="game-container">
+            <canvas id="gameCanvas" width = "800" height="500"></canvas>
+            <div class="game-controls">
+                <button id="startGame" class="game-btn">Start Game</button>
+                <button id="pauseGame" class="game-btn">Pause Game</button>
+                <button id="resetGame" class="game-btn">Reset Game</button>
+                <div class="score-display">
+                    <p>Score: <span id="score">0</span></p>
+                    <p>Lives: <span id="lives">3</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <footer class="footer">
+        <p>&copy; 2025 Andrew Simon. All rights reserved.</p>
+        <div class="social-links">
+            <a href="https://github.com/CheeseyDanish" target="_blank" ><i class="fab fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/andrew-simon-492390265" target="_blank" ><i class="fab fa-linkedin"></i></a>
+        </div>
+    </footer>
+
+    <script src="js/game.js"></script>
+</body>
+</html>
