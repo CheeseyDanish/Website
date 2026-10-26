@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=2">
-    <link rel="stylesheet" href="css/animations.css?v=2">
+    <link rel="stylesheet" href="css/style.css?v=3">
+    <link rel="stylesheet" href="css/animations.css?v=3">
     <!-- 3D viewer: works in Firefox, Chrome, Edge and Safari -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 </head>
@@ -49,6 +49,8 @@
                         <i class="fas fa-file-arrow-down" aria-hidden="true"></i> Download CV
                     </a>
                 </div>
+                <!-- One star per beaten secret game (filled in by js/secrets.js) -->
+                <ul class="star-row" id="star-row" aria-label="Stars earned from the hidden games" hidden></ul>
             </div>
         </div>
     </header>
@@ -164,6 +166,7 @@
         <p class="secret-hint">Psst… a few small games are tucked away on this page. Start with my name.</p>
         <div class="arcade-shelf" id="arcade-shelf" hidden>
             <h2>Games you've found</h2>
+            <p class="star-count" id="star-count"></p>
             <ul id="arcade-list"></ul>
         </div>
     </footer>
@@ -182,9 +185,10 @@
 
     <script src="js/script.js?v=2"></script>
     <script src="js/models.js?v=3"></script>
-    <script src="js/games/simon.js?v=2"></script>
-    <script src="js/games/worm.js?v=2"></script>
-    <script src="js/games/mines.js?v=2"></script>
-    <script src="js/secrets.js?v=2"></script>
+    <script src="js/rewards.js?v=1"></script>
+    <script src="js/games/simon.js?v=3"></script>
+    <script src="js/games/worm.js?v=3"></script>
+    <script src="js/games/mines.js?v=3"></script>
+    <script src="js/secrets.js?v=3"></script>
 </body>
 </html>

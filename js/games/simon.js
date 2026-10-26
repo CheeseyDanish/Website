@@ -17,7 +17,8 @@ window.Games.simon = {
         ],
         startStepMs: 620,   // how long each step shows in round 1
         minStepMs: 260,
-        speedUpPerRound: 25
+        speedUpPerRound: 25,
+        starRound: 7        // complete this round to earn the star (keep js/rewards.js text in sync)
     },
 
     mount(root, api) {
@@ -101,6 +102,7 @@ window.Games.simon = {
                 accepting = false;
                 status.textContent = 'Nice!';
                 bestEl.textContent = 'Best ' + api.best('simon', sequence.length);
+                if (sequence.length >= cfg.starRound) api.star('simon');
                 later(nextRound, 700);
             }
         }

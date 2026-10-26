@@ -148,6 +148,7 @@ window.Games.mines = {
             api.best('mines_wins', wins);
             status.textContent = `Cleared! That's ${wins} win${wins === 1 ? '' : 's'} so far.`;
             api.tone(784, .3);
+            api.star('mines');
         }
 
         // Roving focus so the whole board is one tab stop

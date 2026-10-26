@@ -13,7 +13,8 @@ window.Games.worm = {
         startTickMs: 160,    // time between moves
         minTickMs: 70,
         speedUpPerApple: 4,
-        wrapWalls: false     // true = leave one side, appear on the other
+        wrapWalls: false,    // true = leave one side, appear on the other
+        starApples: 15       // eat this many in one game to earn the star (keep js/rewards.js text in sync)
     },
 
     mount(root, api) {
@@ -95,6 +96,7 @@ window.Games.worm = {
                 scoreEl.textContent = 'Apples ' + score;
                 tickMs = Math.max(cfg.minTickMs, tickMs - cfg.speedUpPerApple);
                 api.tone(520 + score * 8, .08);
+                if (score === cfg.starApples) api.star('worm');
                 placeApple();
             } else {
                 worm.pop();

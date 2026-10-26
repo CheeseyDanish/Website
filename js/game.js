@@ -7,29 +7,30 @@ const resetButton = document.getElementById('resetGame');
 const scoreDisplay = document.getElementById('score');
 const livesDisplay = document.getElementById('lives');
 
-// Game state variables
-let score = 0;
-let lives = 3;
-let gameRunning = false;
-let gamePaused = false;
-let animationFrameId = null;
-
 // Initialize canvas size
 canvas.width = 800;
 canvas.height = 500;
 
-// Paddle Properties
+// Game state: 'idle' | 'running' | 'paused' | 'won' | 'lost'
+let state = 'idle';
+let score = 0;
+let lives = 3;
+let animationFrameId = null;
+let lastTime = 0;
+
+// Paddle Properties (speeds are pixels per second, so it plays the same on any monitor)
 const paddleWidth = 100;
 const paddleHeight = 10;
-const paddleSpeed = 5;
+const paddleSpeed = 480;
 let paddleX = (canvas.width - paddleWidth) / 2;
 
 // Ball Properties
 const ballRadius = 10;
+const ballSpeed = 320;
 let ballX = canvas.width / 2;
 let ballY = canvas.height - 30;
-let ballDX = 2;
-let ballDY = -2;
+let ballDX = 0;
+let ballDY = 0;
 
 // Brick Properties
 const brickRowCount = 5; // set to random number later
@@ -38,7 +39,7 @@ const brickWidth = 75;
 const brickHeight = 20;
 const brickPadding = 10;
 const brickOffsetTop = 30;
-const brickOffsetLeft = 30;
+const brickOffsetLeft = (canvas.width - (brickColumnCount * (brickWidth + brickPadding) - brickPadding)) / 2;
 
 // helper function for colorful bricks
 function getRandomBrickColor() {
@@ -46,16 +47,21 @@ function getRandomBrickColor() {
     return randomColor;
 }
 
-// Create bricks
-const bricks = Array.from({ length: brickColumnCount }, () => 
-    Array.from({ length: brickRowCount }, () => 
+// Create bricks (positions are fixed, so collision never depends on drawing first)
+const bricks = Array.from({ length: brickColumnCount }, (_, c) =>
+    Array.from({ length: brickRowCount }, (_, r) =>
         ({
-            x: 0,
-            y: 0,
+            x: c * (brickWidth + brickPadding) + brickOffsetLeft,
+            y: r * (brickHeight + brickPadding) + brickOffsetTop,
             status: 1,
             color: getRandomBrickColor()
         }))
 );
+
+// Colours come from the site theme so the board matches light/dark mode
+function themeColor(name, fallback) {
+    return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback;
+}
 
 //Event Listeners
 startButton.addEventListener('click', startGame);
@@ -63,64 +69,119 @@ pauseButton.addEventListener('click', pauseGame);
 resetButton.addEventListener('click', resetGame);
 document.addEventListener('keydown', keyDownHandler);
 document.addEventListener('keyup', keyUpHandler);
+// If the window loses focus mid-press, we never get the keyup: let go of the keys
+window.addEventListener('blur', releaseKeys);
+// Coming back with the browser's Back/Forward button restores the old page: start fresh
+window.addEventListener('pageshow', (e) => { if (e.persisted) toIdle(); });
+
+// Mouse / touch: the paddle follows the pointer over the board
+canvas.addEventListener('pointermove', (e) => {
+    if (state !== 'running') return;
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+    paddleX = Math.min(Math.max(x - paddleWidth / 2, 0), canvas.width - paddleWidth);
+});
 
 //keyboard state
 let rightPressed = false;
 let leftPressed = false;
 
+function releaseKeys() {
+    rightPressed = false;
+    leftPressed = false;
+}
+
 function keyUpHandler(e) {
-    if (e.key === 'Right' || e.key === 'ArrowRight') {
+    if (e.key === 'Right' || e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
         rightPressed = false;
-    } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
+    } else if (e.key === 'Left' || e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
         leftPressed = false;
     }
 }
 
 function keyDownHandler(e) {
-    if (e.key === 'Right' || e.key === 'ArrowRight') {
+    if (e.key === 'Right' || e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
         rightPressed = true;
-    } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
+        if (state === 'running') e.preventDefault();
+    } else if (e.key === 'Left' || e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
         leftPressed = true;
-    }
-}
-// Start the game function
-function startGame() {
-    if (!gameRunning) {
-        gameRunning = true;
-        score = 0;
-        lives = 3;
-        scoreDisplay.textContent = score;
-        livesDisplay.textContent = lives;
-        resetBall();
-        resetPaddle();
-        resetBricks();
-        animationFrameId = requestAnimationFrame(gameLoop);
+        if (state === 'running') e.preventDefault();
     }
 }
 
-// Pause the game function
+// Start a brand new game (works from any state: idle, won, lost, paused)
+function startGame() {
+    if (state === 'running') return;
+    if (state === 'paused') return pauseGame();
+    newGame();
+}
+
+function newGame() {
+    cancelAnimationFrame(animationFrameId);
+    score = 0;
+    lives = 3;
+    scoreDisplay.textContent = score;
+    livesDisplay.textContent = lives;
+    releaseKeys();
+    resetBall();
+    resetPaddle();
+    resetBricks();
+    setState('running');
+    lastTime = performance.now();
+    animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+// Pause / resume
 function pauseGame() {
-    gamePaused = !gamePaused;
-    if (!gamePaused) {
+    if (state === 'running') {
+        setState('paused');
+        cancelAnimationFrame(animationFrameId);
+        draw();
+    } else if (state === 'paused') {
+        setState('running');
+        releaseKeys();
+        lastTime = performance.now();
         animationFrameId = requestAnimationFrame(gameLoop);
     }
 }
 
 function resetGame() {
-    gameRunning = false;
-    cancelAnimationFrame(animationFrameId); // Stop the game loop
-    startGame();
+    newGame();
+}
+
+// Back to the "press Start" screen
+function toIdle() {
+    cancelAnimationFrame(animationFrameId);
+    score = 0;
+    lives = 3;
+    scoreDisplay.textContent = score;
+    livesDisplay.textContent = lives;
+    releaseKeys();
+    resetBall();
+    resetPaddle();
+    resetBricks();
+    setState('idle');
+    draw();
+}
+
+function setState(next) {
+    state = next;
+    pauseButton.disabled = !(state === 'running' || state === 'paused');
+    pauseButton.textContent = state === 'paused' ? 'Resume Game' : 'Pause Game';
+    startButton.textContent = (state === 'won' || state === 'lost') ? 'Play Again' : 'Start Game';
 }
 
 function resetBall() {
     ballX = canvas.width / 2;
-    ballY = canvas.height - 30;
-    ballDX = 2;
-    ballDY = -2;
+    ballY = canvas.height - 40;
+    // launch slightly to one side so every rally isn't identical
+    const angle = (-Math.PI / 2) + (Math.random() * 0.6 - 0.3);
+    ballDX = Math.cos(angle) * ballSpeed;
+    ballDY = Math.sin(angle) * ballSpeed;
 }
 
 function resetPaddle() {
-    paddleX = (canvas.width - paddleWidth) / 2; 
+    paddleX = (canvas.width - paddleWidth) / 2;
 }
 
 function resetBricks() {
@@ -132,18 +193,33 @@ function resetBricks() {
     }
 }
 
-// Collision detection
+function bricksLeft() {
+    let count = 0;
+    for (let c = 0; c < brickColumnCount; c++) {
+        for (let r = 0; r < brickRowCount; r++) {
+            count += bricks[c][r].status;
+        }
+    }
+    return count;
+}
+
+// Collision detection: circle vs. rectangle, bouncing off the side it actually hit
 function collisionDetection() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
             const b = bricks[c][r];
-            if (b.status === 1) {
-                if (ballX > b.x && ballX < b.x + brickWidth && ballY > b.y && ballY < b.y + brickHeight) {
-                    ballDY = -ballDY;
-                    b.status = 0;
-                    score++;
-                    scoreDisplay.textContent = score;
-                }
+            if (b.status !== 1) continue;
+            const nearestX = Math.max(b.x, Math.min(ballX, b.x + brickWidth));
+            const nearestY = Math.max(b.y, Math.min(ballY, b.y + brickHeight));
+            const dx = ballX - nearestX;
+            const dy = ballY - nearestY;
+            if (dx * dx + dy * dy <= ballRadius * ballRadius) {
+                b.status = 0;
+                score++;
+                scoreDisplay.textContent = score;
+                if (Math.abs(dx) > Math.abs(dy)) ballDX = -ballDX;
+                else ballDY = -ballDY;
+                return; // one brick per frame keeps bounces predictable
             }
         }
     }
@@ -169,14 +245,11 @@ function drawPaddle() {
 function drawBricks() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
-            if (bricks[c][r].status === 1) {
-                const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-                const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
-                bricks[c][r].x = brickX;
-                bricks[c][r].y = brickY;
+            const b = bricks[c][r];
+            if (b.status === 1) {
                 ctx.beginPath();
-                ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                ctx.fillStyle = bricks[c][r].color;
+                ctx.rect(b.x, b.y, brickWidth, brickHeight);
+                ctx.fillStyle = b.color;
                 ctx.fill();
                 ctx.closePath();
             }
@@ -184,70 +257,113 @@ function drawBricks() {
     }
 }
 
-// Main game loop
-function gameLoop() {
-    if (!gameRunning || gamePaused) return;
+// Big message in the middle of the board (theme text on theme background, AAA contrast)
+function drawMessage(title, subtitle) {
+    ctx.fillStyle = themeColor('--bg', '#1D1814');
+    ctx.globalAlpha = 0.9;
+    ctx.fillRect(0, canvas.height / 2 - 60, canvas.width, 120);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = themeColor('--text', '#F6EDE1');
+    ctx.textAlign = 'center';
+    ctx.font = '700 36px Fraunces, Georgia, serif';
+    ctx.fillText(title, canvas.width / 2, canvas.height / 2 - 4);
+    ctx.font = '500 18px Inter, system-ui, sans-serif';
+    ctx.fillText(subtitle, canvas.width / 2, canvas.height / 2 + 32);
+}
 
-    // Clear canvas
+function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw elements
     drawBricks();
     drawBall();
     drawPaddle();
+    if (state === 'idle') drawMessage('Brick Breaker', 'Press Start Game to play');
+    else if (state === 'paused') drawMessage('Paused', 'Press Resume Game to keep going');
+    else if (state === 'won') drawMessage('You win!', `Final score: ${score}`);
+    else if (state === 'lost') drawMessage('Game over', `Score: ${score}`);
+}
+
+function winGame() {
+    setState('won');
+    releaseKeys();
+    draw(); // the last brick is already gone, so the final frame shows an empty board
+    const firstStar = typeof Rewards !== 'undefined' && Rewards.earn('bricks');
+    if (typeof Rewards !== 'undefined') {
+        Rewards.toast(
+            firstStar
+                ? `You cleared every brick! You earned a star. It's on the front page.`
+                : `You cleared every brick! Final score: ${score}.`,
+            { icon: 'fa-star', link: { href: 'index.html', text: 'Back to the site' } }
+        );
+    }
+}
+
+function loseGame() {
+    setState('lost');
+    releaseKeys();
+    draw();
+    if (typeof Rewards !== 'undefined') {
+        Rewards.toast(`Out of lives. You scored ${score}. Press Play Again to retry.`, { icon: 'fa-heart-crack' });
+    }
+}
+
+// Main game loop
+function gameLoop(now) {
+    if (state !== 'running') return;
+    const dt = Math.min(0.033, (now - lastTime) / 1000); // seconds since last frame, capped
+    lastTime = now;
+
+    //Paddle movement
+    if (rightPressed && paddleX < canvas.width - paddleWidth) {
+        paddleX = Math.min(paddleX + paddleSpeed * dt, canvas.width - paddleWidth);
+    } else if (leftPressed && paddleX > 0) {
+        paddleX = Math.max(paddleX - paddleSpeed * dt, 0);
+    }
+
+    // Ball movement
+    ballX += ballDX * dt;
+    ballY += ballDY * dt;
+
+    // Wall collision (Left/Right)
+    if (ballX > canvas.width - ballRadius) { ballX = canvas.width - ballRadius; ballDX = -Math.abs(ballDX); }
+    if (ballX < ballRadius) { ballX = ballRadius; ballDX = Math.abs(ballDX); }
+    // Wall collision (Top)
+    if (ballY < ballRadius) { ballY = ballRadius; ballDY = Math.abs(ballDY); }
+
+    // Paddle collision
+    const paddleTop = canvas.height - paddleHeight;
+    if (ballDY > 0 && ballY + ballRadius >= paddleTop && ballY < paddleTop + paddleHeight &&
+        ballX > paddleX - ballRadius && ballX < paddleX + paddleWidth + ballRadius) {
+        // Adjust ball direction based on where it hits the paddle (-1 left edge .. 1 right edge)
+        const hitPosition = ((ballX - paddleX) / paddleWidth) * 2 - 1;
+        const angle = Math.max(-1, Math.min(1, hitPosition)) * (Math.PI / 3);
+        ballDX = Math.sin(angle) * ballSpeed;
+        ballDY = -Math.cos(angle) * ballSpeed;
+        ballY = paddleTop - ballRadius;
+    } else if (ballY - ballRadius > canvas.height) {
+        // Ball falls below paddle
+        lives--;
+        livesDisplay.textContent = lives;
+        if (lives <= 0) {
+            return loseGame();
+        }
+        resetBall();
+        resetPaddle();
+    }
 
     // Collision
     collisionDetection();
 
-    // Ball movement
-    ballX += ballDX;
-    ballY += ballDY;
-
-    // Wall collision (Left/Right)
-    if (ballX + ballDX > canvas.width - ballRadius || ballX + ballDX < ballRadius) {
-        ballDX = -ballDX;
-    }
-    // Wall collision (Top)
-    if (ballY + ballDY < ballRadius) {
-        ballDY = -ballDY;
-    } else if (ballY + ballDY > canvas.height - ballRadius) {
-        // Paddle collision
-        if (ballX > paddleX && ballX < paddleX + paddleWidth) {
-            ballDY = -ballDY;
-
-            // Adjust ball direction based on where it hits the paddle
-            const hitPosition = (ballX - paddleX) / paddleWidth;
-            ballDX = 2 * hitPosition - 1;// Adjust multiplier for different angles
-        } else {
-            // Ball falls below paddle
-            lives--;
-            livesDisplay.textContent = lives;
-            if (lives <= 0) {
-                alert('Game Over! Your score was: ' + score);
-                resetGame();
-                gameRunning = false;
-                cancelAnimationFrame(animationFrameId); // Stop the game loop
-            } else {
-                resetBall();
-            }
-        }
+    // Check win condition before drawing, so the last brick disappears
+    if (bricksLeft() === 0) {
+        return winGame();
     }
 
-//Paddle movement
-if (rightPressed && paddleX < canvas.width - paddleWidth) {
-    paddleX += paddleSpeed;
-} else if (leftPressed && paddleX > 0) {
-    paddleX -= paddleSpeed;
+    draw();
+
+    // Continue game loop
+    animationFrameId = requestAnimationFrame(gameLoop);
 }
 
-// Check win condition
-if (score === brickRowCount * brickColumnCount) {
-    alert('You win! Final Score: ' + score);
-    gameRunning = false;
-    gamePaused = false;
-}
-
-// Continue game loop
-animationFrameId = requestAnimationFrame(gameLoop);
-
-}
+toIdle();
+// Redraw once the web fonts arrive so the start message uses them
+if (document.fonts) document.fonts.ready.then(() => { if (state === 'idle') draw(); });

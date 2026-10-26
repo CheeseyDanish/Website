@@ -77,7 +77,13 @@ const Secrets = (function () {
                 } catch (e) { /* audio not available */ }
             };
         })(),
-        css(name) { return getComputedStyle(document.body).getPropertyValue(name).trim(); }
+        css(name) { return getComputedStyle(document.body).getPropertyValue(name).trim(); },
+        // Call when the player beats a game; the first time earns its star (see js/rewards.js)
+        star(id) {
+            if (Rewards.earn(id)) {
+                Rewards.toast(`Star earned! ${Rewards.goal(id)}. It's on the front page now.`, { icon: 'fa-star' });
+            }
+        }
     };
 
     function renderShelf() {
@@ -87,11 +93,41 @@ const Secrets = (function () {
             btn.type = 'button';
             btn.className = 'btn btn-ghost btn-small';
             btn.textContent = infoFor(s).title;
+            if (Rewards.has(s.id)) {
+                btn.insertAdjacentHTML('beforeend', '<i class="fas fa-star shelf-star" aria-hidden="true"></i><span class="visually-hidden"> (star earned)</span>');
+            }
             btn.addEventListener('click', () => open(s));
             shelfList.appendChild(btn);
         });
         shelf.hidden = shelfList.children.length === 0;
+        starCount.textContent = `${Rewards.stars().length} of ${Rewards.total} stars earned`;
     }
+
+    // One star per beaten game, shown under the hero buttons
+    const starRow = document.getElementById('star-row');
+    const starCount = document.getElementById('star-count');
+    const SEEN_KEY = 'starsSeen';
+    function renderStars() {
+        const earned = SECRETS.map((s) => s.id).filter((id) => Rewards.has(id));
+        let seen = [];
+        try { seen = JSON.parse(localStorage.getItem(SEEN_KEY)) || []; } catch (e) { /* ignore */ }
+        starRow.innerHTML = '';
+        earned.forEach((id) => {
+            const li = document.createElement('li');
+            li.title = Rewards.goal(id);
+            li.innerHTML = '<i class="fas fa-star" aria-hidden="true"></i>';
+            li.append(Object.assign(document.createElement('span'), { className: 'visually-hidden', textContent: Rewards.goal(id) }));
+            if (!seen.includes(id)) li.classList.add('new');
+            starRow.appendChild(li);
+        });
+        starRow.hidden = earned.length === 0;
+        try { localStorage.setItem(SEEN_KEY, JSON.stringify(earned)); } catch (e) { /* ignore */ }
+    }
+
+    function refresh() { renderShelf(); renderStars(); }
+    document.addEventListener('stars:changed', refresh);
+    // Returning with the Back button shows a saved copy of the page: bring it up to date
+    window.addEventListener('pageshow', (e) => { if (e.persisted) { found = loadFound(); refresh(); } });
 
     function unlock(secret) {
         if (!found.includes(secret.id)) {
@@ -124,7 +160,7 @@ const Secrets = (function () {
     dialog.addEventListener('close', close);
     dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
 
-    renderShelf();
+    refresh();
     return { unlock, open, list: SECRETS };
 })();
 
@@ -203,19 +239,20 @@ const Secrets = (function () {
     const secret = SECRETS.find((s) => s.id === 'bricks');
     if (!chips.length || !secret) return;
     let broken = 0;
+    function mend() {
+        chips.forEach((c) => c.classList.remove('broken'));
+        broken = 0;
+    }
     chips.forEach((chip) => {
         chip.addEventListener('click', () => {
             if (chip.classList.contains('broken')) return;
-            if (!chip.classList.contains('cracked')) { chip.classList.add('cracked'); return; }
             chip.classList.add('broken');
             broken++;
             if (broken === chips.length) {
-                setTimeout(() => {
-                    chips.forEach((c) => c.classList.remove('cracked', 'broken'));
-                    broken = 0;
-                    Secrets.unlock(secret);
-                }, 600);
+                setTimeout(() => { mend(); Secrets.unlock(secret); }, 600);
             }
         });
     });
+    // Coming back from Brick Breaker with the Back button: start the puzzle over
+    window.addEventListener('pageshow', (e) => { if (e.persisted) mend(); });
 })();

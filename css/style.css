@@ -350,7 +350,6 @@ main { display: block; }
     transition: transform var(--transition), opacity .35s ease;
 }
 .skill-chip i { color: var(--accent); }
-.skill-chip.cracked { transform: rotate(-3deg) scale(.96); border-style: dashed; }
 .skill-chip.broken { opacity: .35; transform: translateY(6px) rotate(4deg) scale(.9); }
 
 /* === 3D models === */
@@ -646,6 +645,79 @@ main { display: block; }
 
 .score-display { display: flex; gap: 1.5rem; color: var(--text); font-family: var(--font-mono); font-size: 1.1rem; }
 .score-display p { margin: 0; }
+
+.game-container canvas { touch-action: none; }
+
+/* === Toasts (js/rewards.js) === */
+.toast-region {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .75rem;
+    pointer-events: none;
+}
+.toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    max-width: 26rem;
+    padding: .9rem 1rem;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .3);
+    animation: toastIn .3s ease both;
+}
+.toast.leaving { animation: toastOut .3s ease both; }
+.toast > i { color: var(--accent); font-size: 1.25rem; flex: none; }
+.toast p { margin: 0; flex: 1; }
+.toast a { font-weight: 600; white-space: nowrap; }
+.toast-close {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2rem; height: 2rem;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+}
+.toast-close:hover { background: var(--surface-2); }
+
+/* === Stars earned from the mini games === */
+.star-row {
+    display: flex;
+    justify-content: center;
+    gap: .5rem;
+    list-style: none;
+    padding: 0;
+    margin: 1.75rem 0 0;
+}
+.star-row[hidden] { display: none; }
+.star-row li {
+    display: grid;
+    place-items: center;
+    width: 2.5rem; height: 2.5rem;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-size: 1.1rem;
+    box-shadow: var(--shadow);
+}
+.star-row li.new { animation: starPop .8s ease both; }
+
+.shelf-star { color: var(--accent); margin-left: .35rem; }
+.star-count { margin: 0 0 .75rem !important; }
 
 /* === Motion preferences === */
 @media (prefers-reduced-motion: reduce) {

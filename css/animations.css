@@ -36,6 +36,21 @@
     to { opacity: 1; transform: none; }
 }
 
+@keyframes toastIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes toastOut {
+    to { opacity: 0; transform: translateY(12px); }
+}
+
+/* A newly earned star pops in */
+@keyframes starPop {
+    0% { transform: scale(0) rotate(-90deg); }
+    70% { transform: scale(1.25) rotate(10deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .reveal, .animate-slide-up { opacity: 1; transform: none; }
 }
