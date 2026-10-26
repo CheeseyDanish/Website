@@ -648,6 +648,98 @@ main { display: block; }
 
 .game-container canvas { touch-action: none; }
 
+/* === Projects (index.html) === */
+.projects-grid { display: grid; gap: 1.5rem; }
+
+.project-card { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.project-card:hover { transform: translateY(-4px); }
+@media (min-width: 760px) {
+    .project-card { flex-direction: row; }
+    .project-card .project-banner { flex: 0 0 44%; aspect-ratio: auto; min-height: 280px; }
+}
+
+/* Decorative night-sea banner; no text sits on it */
+.project-banner {
+    position: relative;
+    aspect-ratio: 16 / 7;
+    background:
+        radial-gradient(circle at 74% 34%, #FDF6DC 0 7%, rgba(253, 246, 220, .25) 8%, transparent 22%),
+        linear-gradient(180deg, #070B1D 0%, #16213F 52%, #1B2D52 53%, #0F1D3A 72%, #5F4C35 73%, #3D3226 100%);
+}
+.project-banner::before {   /* the wall */
+    content: "";
+    position: absolute;
+    left: 6%; bottom: 0;
+    width: 12%; height: 52%;
+    background: repeating-linear-gradient(0deg, #57534E 0 14%, #3F3F46 14% 16%);
+    border-top: 6px dashed #5B5755;
+}
+.project-banner::after {    /* surf */
+    content: "";
+    position: absolute;
+    right: 0; bottom: 0;
+    width: 22%; height: 30%;
+    background: rgba(30, 64, 120, .85);
+    border-top: 2px solid rgba(219, 234, 254, .6);
+    border-top-left-radius: 40% 30%;
+}
+
+.project-body { padding: 1.5rem 1.75rem 1.75rem; display: flex; flex-direction: column; gap: .75rem; flex: 1; }
+.project-body h3 { font-size: 1.4rem; margin: 0; }
+.project-body .description { flex: 1; }
+.project-tags { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; padding: 0; margin: 0; }
+.project-tags li {
+    font: .85rem var(--font-mono);
+    color: var(--accent-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: .15rem .65rem;
+}
+.project-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .25rem; }
+
+/* === Tidewall page (Tidewall.html) === */
+.tidewall-page { padding-top: 1.5rem; }
+.tidewall-page .section-head { margin-bottom: 1rem; }
+.tidewall-page .section-title { font-size: clamp(1.6rem, 3vw, 2rem); }
+.tidewall-page .section-lede { margin-top: .4rem; }
+
+.tidewall-frame {
+    /* as wide as possible while the whole 16:9 game fits on screen under the page header */
+    width: min(100%, calc((100vh - 12.5rem) * 16 / 9));
+    max-width: 1280px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: #050814;
+    box-shadow: var(--shadow);
+}
+.tidewall-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+.tidewall-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 1.5rem;
+    max-width: 1280px;
+    margin: 2rem auto 0;
+}
+.tidewall-info h2 { font-size: 1.35rem; }
+.tidewall-keys { list-style: none; padding: 0; margin: 0; display: grid; gap: .55rem; color: var(--muted); }
+
+kbd {
+    display: inline-block;
+    min-width: 1.6em;
+    padding: .05rem .45rem;
+    font: .85rem var(--font-mono);
+    text-align: center;
+    color: var(--text);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-bottom-width: 3px;
+    border-radius: 6px;
+}
+
 /* === Toasts (js/rewards.js) === */
 .toast-region {
     position: fixed;

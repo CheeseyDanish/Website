@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andrew Simon | Tidewall</title>
+    <meta name="description" content="Tidewall: a browser wall-defense game. Hold a sea wall for twenty nights against creatures from the surf.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css?v=4">
+    <link rel="stylesheet" href="css/animations.css?v=3">
+</head>
+
+<body class="dark-mode">
+    <script>
+        // Match the theme chosen on the main page
+        try { if (localStorage.getItem('darkMode') === 'false') document.body.classList.remove('dark-mode'); } catch (e) {}
+    </script>
+
+    <nav class="navbar" aria-label="Main">
+        <a class="nav-brand" href="index.html#projects"><i class="fas fa-arrow-left" aria-hidden="true"></i> Andrew Simon</a>
+    </nav>
+
+    <main id="main">
+        <section id="tidewall" class="section tidewall-page">
+            <div class="section-head">
+                <h1 class="section-title">Tidewall</h1>
+                <p class="section-lede">Click the game to start. Best with a mouse and keyboard.</p>
+            </div>
+
+            <div class="tidewall-frame">
+                <iframe id="tidewall-game" src="tidewall/index.html" title="Tidewall game" allow="fullscreen" allowfullscreen></iframe>
+            </div>
+
+            <div class="game-controls">
+                <button id="tidewall-full" class="game-btn" type="button"><i class="fas fa-expand" aria-hidden="true"></i> Fullscreen</button>
+                <a class="btn btn-ghost btn-small" href="tidewall/index.html" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square" aria-hidden="true"></i> Open in its own tab</a>
+            </div>
+
+            <div class="tidewall-info">
+                <div class="card">
+                    <h2>Controls</h2>
+                    <ul class="tidewall-keys">
+                        <li><kbd>Mouse</kbd> Aim, hold left click to fire</li>
+                        <li><kbd>R</kbd> Reload. Tap again in the green zone for a Perfect reload</li>
+                        <li><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>Q</kbd> Switch weapons</li>
+                        <li><kbd>Space</kbd> <kbd>E</kbd> Gadgets</li>
+                        <li><kbd>Esc</kbd> Pause &nbsp;·&nbsp; <kbd>M</kbd> Mute</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h2>About the project</h2>
+                    <p class="description">Hold a crumbling sea wall for twenty nights. Enemies crawl out of the surf wet and dry off as they cross the sand, so where you kill them matters.</p>
+                    <p class="description" style="margin-top:1rem">A wall-defense game in the style of the old Flash classics <em>The Last Stand</em> and <em>Bunny Invasion</em>. It has 8 weapons, 9 mods, gadgets, beach traps, a hireable crew, tide cards that trade risk for scrap, and four boss fights.</p>
+                    <p class="description" style="margin-top:1rem">Written in plain JavaScript with no libraries. All the art is drawn in code and every sound is synthesized with the Web Audio API. I balanced it with a headless bot that plays full 20-night campaigns.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; <span id="year">2026</span> Andrew Simon. All rights reserved.</p>
+        <div class="social-links">
+            <a href="https://github.com/CheeseyDanish" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
+            <a href="https://www.linkedin.com/in/andrew-simon-492390265" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+        const f = document.getElementById('tidewall-game');
+        document.getElementById('tidewall-full').addEventListener('click', () => {
+            const go = f.requestFullscreen || f.webkitRequestFullscreen;
+            if (go) go.call(f);
+            f.focus();
+        });
+    </script>
+</body>
+</html>

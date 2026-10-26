@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=3">
+    <link rel="stylesheet" href="css/style.css?v=4">
     <link rel="stylesheet" href="css/animations.css?v=3">
     <!-- 3D viewer: works in Firefox, Chrome, Edge and Safari -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
@@ -24,6 +24,7 @@
         <ul class="nav-links">
             <li><a href="#education">Education</a></li>
             <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
             <li><a href="#models">3D Work</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
@@ -127,8 +128,34 @@
             </ul>
         </section>
 
+        <!-- Projects Section -->
+        <section id="projects" class="section alt">
+            <div class="section-head reveal">
+                <h2 class="section-title">Projects</h2>
+                <p class="section-lede">Things I've built that you can try right here in the browser.</p>
+            </div>
+            <div class="projects-grid">
+                <article class="card project-card reveal">
+                    <div class="project-banner" aria-hidden="true"></div>
+                    <div class="project-body">
+                        <h3>Tidewall</h3>
+                        <p class="description">A wall-defense game in the style of <em>The Last Stand</em>. Hold a sea wall for twenty nights. Enemies come out of the surf wet, which changes how fire, frost and shock hit them, so your loadout decides where on the beach you're strongest.</p>
+                        <ul class="project-tags" aria-label="Built with">
+                            <li>JavaScript</li>
+                            <li>Canvas</li>
+                            <li>Web Audio</li>
+                            <li>Game design</li>
+                        </ul>
+                        <div class="project-actions">
+                            <a href="Tidewall.html" class="btn btn-primary btn-small"><i class="fas fa-play" aria-hidden="true"></i> Play Tidewall</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
         <!-- 3D Models Section (cards are built from the list in js/models.js) -->
-        <section id="models" class="section alt">
+        <section id="models" class="section">
             <div class="section-head reveal">
                 <h2 class="section-title">3D Work</h2>
                 <p class="section-lede">Models I've made in Blender, mostly low-poly props for games. Drag to orbit, scroll or pinch to zoom.</p>
@@ -138,7 +165,7 @@
         </section>
 
         <!-- Contact Section -->
-        <section id="contact" class="section">
+        <section id="contact" class="section alt">
             <div class="section-head reveal">
                 <h2 class="section-title">Get in Touch</h2>
             </div>
