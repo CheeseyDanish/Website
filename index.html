@@ -3,139 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Andrew Simon | CS Portfolio</title>
+    <title>Andrew Simon | Computer Science Portfolio</title>
+    <meta name="description" content="Andrew Simon — B.Sc. Computer Science graduate and IT specialist. Education, experience, 3D work, and contact details.">
+    <meta name="theme-color" content="#1D1814">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%231D1814'/><text x='50' y='68' font-size='56' text-anchor='middle' fill='%23F2B77E' font-family='Georgia,serif' font-weight='700'>AS</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Space+Mono&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
-
+    <!-- 3D viewer: works in Firefox, Chrome, Edge and Safari -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 </head>
-<body class="dark-mode"> <!-- Hero Section -->
-    <header class="hero">
-        <nav class="navbar">
-            <div class="nav-brand">
-                <button id="theme-toggle" class="theme-btn">
-                    <i class="fas fa-sun"></i>
-                </button>
-            </div>
-            <!-- commenting out navigational links since the page isnt that big 
-            <ul class="nav-links">
-                <li><a href="#education">Education</a></li>
-                <li><a href="#experience">Experience</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-            -->
-        </nav>
+<body class="dark-mode">
+    <a class="skip-link" href="#main">Skip to content</a>
 
+    <nav class="navbar" aria-label="Main">
+        <a class="nav-brand" href="#top">Andrew Simon</a>
+        <ul class="nav-links">
+            <li><a href="#education">Education</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#models">3D Work</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button id="theme-toggle" class="theme-btn" type="button" aria-label="Switch to light theme">
+            <i class="fas fa-sun" aria-hidden="true"></i>
+        </button>
+    </nav>
+
+    <header class="hero" id="top">
         <div class="hero-container">
-            <div id="hero-bg"></div> <!-- Background (particles) -->
-            
+            <canvas id="hero-bg" aria-hidden="true"></canvas>
+
             <div class="hero-content">
-                <h1>Andrew Simon</h1>
-                <p class="subtitle">B.Sc. Computer Science & IT Specialist</p>
-                <div class="cta-container">
-                    <a href="https://www.linkedin.com/in/andrew-simon-492390265" class="cta-btn" target="_blank">Hire Me</a>
-                    <a href="assets/resume.pdf" target="_blank">Download CV</a>
+                <p class="eyebrow animate-slide-up">Software · Systems · 3D</p>
+                <!-- Letters are filled in by js/secrets.js; the plain name stays for screen readers and no-JS -->
+                <h1 id="hero-name" class="animate-slide-up delay-1">Andrew Simon</h1>
+                <p class="subtitle animate-slide-up delay-2">B.Sc. Computer Science graduate &amp; IT specialist who enjoys building tidy software, dependable systems, and the occasional 3D model.</p>
+                <div class="cta-container animate-slide-up delay-3">
+                    <a href="https://www.linkedin.com/in/andrew-simon-492390265" class="btn btn-primary" target="_blank" rel="noopener">
+                        <i class="fab fa-linkedin" aria-hidden="true"></i> Hire Me
+                    </a>
+                    <a href="assets/resume.pdf" class="btn btn-ghost" target="_blank" rel="noopener">
+                        <i class="fas fa-file-arrow-down" aria-hidden="true"></i> Download CV
+                    </a>
                 </div>
             </div>
         </div>
     </header>
 
-    <main>
+    <main id="main">
         <!-- Education Section -->
         <section id="education" class="section">
-            <h2 class="section-title">Education</h2>
+            <div class="section-head reveal">
+                <h2 class="section-title">Education</h2>
+            </div>
             <div class="timeline">
-                <div class="timeline-item">
+                <article class="timeline-item reveal">
                     <h3>University of Windsor</h3>
-                    <p class="date">Sept 2020 - Sept 2024</p>
+                    <p class="date">Sept 2020 – Sept 2024</p>
                     <p class="description">
                         I have a Bachelor's in Computer Science: Applied Computing with Honours, focusing on software development
                         and network systems design. Key coursework includes advanced algorithms, distributed
-                        systems, and machine learning fundamentals. <br> <br> I also volunteered in the <a href="https://www.uwsa.ca/walksafe" target="_blank" >WalkSafe</a> program 
+                        systems, and machine learning fundamentals.
                     </p>
-                </div>
-                <div class="timeline-item">
-                    <h3>Google IT Certificate  <a href="assets/GoogleCertificate.pdf" target="_blank">link</a></h3>
-                    <p class="date">Completed May 2022</p>
+                    <p class="description" style="margin-top:1rem">
+                        I also volunteered in the <a href="https://www.uwsa.ca/walksafe" target="_blank" rel="noopener">WalkSafe</a> program.
+                    </p>
+                </article>
+                <article class="timeline-item reveal">
+                    <h3>Google IT Certificate</h3>
+                    <p class="date">Completed May 2022 · <a href="assets/GoogleCertificate.pdf" target="_blank" rel="noopener">View certificate</a></p>
                     <p class="description">
                         Comprehensive IT certification covering system administration, network troubleshooting,
                         and Linux/CLI expertise. Hands-on experience with enterprise-level IT infrastructure.
                     </p>
-                </div>
+                </article>
             </div>
         </section>
 
         <!-- Experience Section -->
-        <section id="experience" class="section dark-bg">
-            <h1 class="section-title">Experience</h1>
+        <section id="experience" class="section alt">
+            <div class="section-head reveal">
+                <h2 class="section-title">Experience</h2>
+            </div>
             <div class="timeline">
-                <div class="timeline-item">
+                <article class="timeline-item reveal">
                     <h3>AI Writing Evaluator</h3>
-                    <p class="date">May 2024 - Jul 2024</p>
+                    <p class="date">May 2024 – Jul 2024 · Outlier</p>
                     <p class="description">
-                        Evaluated and improved AI-generated content quality at Outlier, working closely with
+                        Evaluated and improved AI-generated content quality, working closely with
                         NLP algorithms and machine learning models to enhance writing mechanics.
                     </p>
-                </div>
-                <div class="timeline-item">
+                </article>
+                <article class="timeline-item reveal">
                     <h3>IT Support Co-op</h3>
-                    <p class="date">Jan 2020 - Apr 2020</p>
+                    <p class="date">Jan 2020 – Apr 2020</p>
                     <p class="description">
                         Installed and configured Windows operating systems on newly assembled computers.
                         Built and tested custom computer setups, ensuring hardware and software functionality.
                         Measured, cut, and fabricated pipes for store use.
                     </p>
-                </div>
+                </article>
             </div>
         </section>
 
-        <!-- Skills Section -->        
-        <!-- Most of the work in this section is done in the script.js file, specifically lines 24 through 38 -->
+        <!-- Skills Section -->
         <section id="skills" class="section">
-            <h2 class="section-title">Technical Arsenal</h2>
-            <div class="skills-container">
-              <b>Python, JavaScript, CSS, HTML, C#, C++</b>
+            <div class="section-head reveal">
+                <h2 class="section-title">Technical Toolkit</h2>
             </div>
-          </section>
+            <ul class="skills-container reveal" id="skills-list">
+                <li class="skill-chip"><i class="fab fa-python" aria-hidden="true"></i> Python</li>
+                <li class="skill-chip"><i class="fab fa-js" aria-hidden="true"></i> JavaScript</li>
+                <li class="skill-chip"><i class="fab fa-html5" aria-hidden="true"></i> HTML</li>
+                <li class="skill-chip"><i class="fab fa-css3-alt" aria-hidden="true"></i> CSS</li>
+                <li class="skill-chip"><i class="fas fa-hashtag" aria-hidden="true"></i> C#</li>
+                <li class="skill-chip"><i class="fas fa-code" aria-hidden="true"></i> C++</li>
+                <li class="skill-chip"><i class="fas fa-cube" aria-hidden="true"></i> Blender</li>
+            </ul>
+        </section>
+
+        <!-- 3D Models Section (cards are built from the list in js/models.js) -->
+        <section id="models" class="section alt">
+            <div class="section-head reveal">
+                <h2 class="section-title">3D Work</h2>
+                <p class="section-lede">A few models I've made in Blender. Load one, then drag to orbit, scroll or pinch to zoom.</p>
+            </div>
+            <div class="models-grid" id="models-grid"></div>
+            <p class="model-hint">Runs in Firefox, Chrome, Edge and Safari, no plugins needed.</p>
+        </section>
 
         <!-- Contact Section -->
-        <section id="contact" class="section dark-bg">
-            <h2 class="section-title">Get in Touch</h2>
-            <div class="contact-grid">
-                <div class="contact-info">
-                    <h3>Let's Connect</h3>
-                    <p>
-                        I'm always open to discussing new projects, creative ideas, or opportunities
-                        to be part of your team. Feel free to reach out through any of these channels:
-                    </p>
-                    <ul class="contact-list">
-                        <li><i class="fas fa-envelope"></i> andrewsimon2918@gmail.com</li>
-                        <li><i class="fab fa-linkedin"></i> <a href="https://www.linkedin.com/in/andrew-simon-492390265" target="_blank" >Linkedin.com </a></li>
-                    </ul>
-                </div>
-                <!--
-                <form class="contact-form">
-                    <input type="text" placeholder="Your Name" required>
-                    <input type="email" placeholder="Your Email" required>
-                    <textarea placeholder="Your Message" required></textarea>
-                    <button type="submit">Send Message</button>
-                </form>
-                -->
+        <section id="contact" class="section">
+            <div class="section-head reveal">
+                <h2 class="section-title">Get in Touch</h2>
+            </div>
+            <div class="card contact-card reveal">
+                <h3>Let's connect</h3>
+                <p class="description">
+                    I'm always open to discussing new projects, creative ideas, or opportunities
+                    to be part of your team. Feel free to reach out through any of these channels:
+                </p>
+                <ul class="contact-list">
+                    <li><i class="fas fa-envelope" aria-hidden="true"></i> <a href="mailto:andrewsimon2918@gmail.com">andrewsimon2918@gmail.com</a></li>
+                    <li><i class="fab fa-linkedin" aria-hidden="true"></i> <a href="https://www.linkedin.com/in/andrew-simon-492390265" target="_blank" rel="noopener">LinkedIn</a></li>
+                    <li><i class="fab fa-github" aria-hidden="true"></i> <a href="https://github.com/CheeseyDanish" target="_blank" rel="noopener">GitHub</a></li>
+                </ul>
             </div>
         </section>
     </main>
 
     <footer class="footer">
-        <p>&copy; 2025 Andrew Simon. All rights reserved.</p>
+        <p>&copy; <span id="year">2026</span> Andrew Simon. All rights reserved.</p>
         <div class="social-links">
-            <a href="https://github.com/CheeseyDanish" target="_blank" ><i class="fab fa-github"></i></a>
-            <a href="https://www.linkedin.com/in/andrew-simon-492390265" target="_blank" ><i class="fab fa-linkedin"></i></a>
+            <a href="https://github.com/CheeseyDanish" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github" aria-hidden="true"></i></a>
+            <a href="https://www.linkedin.com/in/andrew-simon-492390265" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin" aria-hidden="true"></i></a>
+        </div>
+        <p class="secret-hint">Psst… a few small games are tucked away on this page. Start with my name.</p>
+        <div class="arcade-shelf" id="arcade-shelf" hidden>
+            <h2>Games you've found</h2>
+            <ul id="arcade-list"></ul>
         </div>
     </footer>
 
+    <!-- Secret game window -->
+    <dialog class="game-dialog" id="game-dialog" aria-labelledby="game-title">
+        <div class="game-dialog-head">
+            <div>
+                <h2 id="game-title">Game</h2>
+                <p id="game-tagline"></p>
+            </div>
+            <button class="icon-btn" type="button" id="game-close" aria-label="Close game"><i class="fas fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <div class="game-root" id="game-root"></div>
+    </dialog>
+
     <script src="js/script.js"></script>
+    <script src="js/models.js"></script>
+    <script src="js/games/simon.js"></script>
+    <script src="js/games/worm.js"></script>
+    <script src="js/games/mines.js"></script>
+    <script src="js/secrets.js"></script>
 </body>
 </html>
