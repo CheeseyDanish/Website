@@ -1,9 +1,35 @@
+/**
+ * models.js — the "3D Work" gallery on the front page (index.html, #models-grid).
+ *
+ * Builds one card per entry in MODELS. Each card holds a Google <model-viewer> element
+ * (loaded from jsDelivr in index.html's <head>), so visitors can orbit and zoom the model
+ * with no plugins.
+ *
+ * Load order: after script.js. Globals defined: MODEL_VERSION, MODELS.
+ * Depends on: #models-grid in index.html; the .model-* styles in css/style.css.
+ */
+
 // === 3D model gallery ===
 // To add a model: export it from Blender as glTF Binary (.glb, Draco compression on)
 // into assets/models/, then add an entry below.
 // Small files (autoload: true) load as they scroll into view; bigger ones wait for a "Load" click.
 // After re-exporting a model, bump MODEL_VERSION so browsers don't show a cached copy.
+
+/** Appended to every model URL as ?v=N to bust browser caches after a re-export. */
 const MODEL_VERSION = 2;
+
+/**
+ * @typedef {Object} ModelEntry
+ * @property {string}  title        Card heading.
+ * @property {string}  file         Path to the .glb, relative to the site root.
+ * @property {string}  size         Human-readable file size, shown on the card and the Load button.
+ * @property {boolean} [autoload]   true = load as soon as it scrolls into view (use for files under ~100 KB).
+ *                                  Omit for big files, which wait for a "Load 3D model" click to save data.
+ * @property {string}  description  One-line caption under the heading.
+ * @property {string}  alt          Text alternative read by screen readers.
+ */
+
+/** Every model in the gallery, in display order. @type {ModelEntry[]} */
 const MODELS = [
     {
         title: 'Burger',
@@ -77,11 +103,25 @@ const MODELS = [
     }
 ];
 
+/**
+ * Build the gallery: one card per MODELS entry, appended to #models-grid.
+ * Card structure: article.card.model-card > div.model-stage (viewer + poster) + div.model-body (text).
+ * Cards get .reveal.is-visible straight away, because they're created after script.js has
+ * already set up the scroll observer.
+ */
 (function buildGallery() {
     const grid = document.getElementById('models-grid');
     if (!grid) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    /**
+     * Create the <model-viewer> for a model and put it in the card's stage.
+     * The poster (placeholder icon/button) stays on top until the model loads, then is removed;
+     * if loading fails, the poster shows an error message instead.
+     * @param {ModelEntry}  model
+     * @param {HTMLElement} stage   the .model-stage container.
+     * @param {HTMLElement} poster  the .model-poster placeholder inside the stage.
+     */
     function showViewer(model, stage, poster) {
         const viewer = document.createElement('model-viewer');
         viewer.setAttribute('src', `${model.file}?v=${MODEL_VERSION}`);
@@ -93,6 +133,7 @@ const MODELS = [
         viewer.setAttribute('shadow-intensity', '1');
         viewer.setAttribute('exposure', '1.05');
         viewer.setAttribute('interaction-prompt', 'auto');
+        // Slow auto-spin, unless the visitor asked for reduced motion
         if (!reduceMotion) viewer.setAttribute('auto-rotate', '');
         viewer.addEventListener('load', () => poster.remove());
         viewer.addEventListener('error', () => {
@@ -115,6 +156,7 @@ const MODELS = [
 
         const body = document.createElement('div');
         body.className = 'model-body';
+        // Title and description go in via textContent so they can never inject HTML
         body.innerHTML = `<h3></h3><p></p><p class="model-meta">.glb · ${model.size}</p>`;
         body.querySelector('h3').textContent = model.title;
         body.querySelector('p').textContent = model.description;
@@ -130,6 +172,7 @@ const MODELS = [
             loadBtn.setAttribute('aria-label', `Load the ${model.title} 3D model, ${model.size}`);
             poster.appendChild(loadBtn);
             loadBtn.addEventListener('click', () => {
+                // The viewer library comes from a CDN; if it never registered, say so instead of failing silently
                 if (!customElements.get('model-viewer')) {
                     poster.innerHTML = '<p class="model-error">The 3D viewer couldn’t load. Check your connection and refresh the page.</p>';
                     return;

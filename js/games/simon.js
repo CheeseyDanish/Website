@@ -1,6 +1,11 @@
 // === Simon Says ===
 // Watch the pattern, then repeat it. Each round adds one step.
 // Room to grow: more pads, a "strict" mode, faster tempo tiers, themed sound sets.
+//
+// Unlock: spell SIMON with the hero letters (js/secrets.js). Star: complete round config.starRound.
+// Registers window.Games.simon following the mini-game contract described in js/secrets.js
+// and docs/ARCHITECTURE.md: { title, tagline, config, mount(root, api) -> cleanup }.
+// Best score is stored as localStorage 'best_simon' (the highest round completed).
 window.Games = window.Games || {};
 
 window.Games.simon = {
@@ -21,12 +26,18 @@ window.Games.simon = {
         starRound: 7        // complete this round to earn the star (keep js/rewards.js text in sync)
     },
 
+    /**
+     * Build the game inside the dialog.
+     * @param {HTMLElement} root  empty container to render into.
+     * @param {Object} api        shared helpers from js/secrets.js (el, best, tone, css, star).
+     * @returns {Function} cleanup: cancels pending timers and removes the key listener.
+     */
     mount(root, api) {
         const cfg = this.config;
-        let sequence = [];
-        let input = 0;
-        let accepting = false;
-        let timers = [];
+        let sequence = [];      // pad indexes to repeat, one more each round
+        let input = 0;          // how many steps of the sequence the player has repeated this round
+        let accepting = false;  // true only while it's the player's turn
+        let timers = [];        // every pending setTimeout, so cleanup/restart can cancel them
 
         const roundEl = api.el('span', { textContent: 'Round 0' });
         const bestEl = api.el('span', { textContent: 'Best ' + api.best('simon') });
@@ -53,8 +64,14 @@ window.Games.simon = {
             api.el('p', { className: 'game-help', textContent: 'Click the pads or press 1–4.' })
         );
 
+        /** setTimeout that's tracked in `timers`. */
         function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
 
+        /**
+         * Light up pad i and play its note.
+         * @param {number} i   pad index.
+         * @param {number} ms  how long the step lasts; the light stays on for 80% of it.
+         */
         function flash(i, ms) {
             const pad = cfg.pads[i];
             padEls[i].classList.add('lit');
@@ -66,10 +83,12 @@ window.Games.simon = {
             }, ms * .8);
         }
 
+        /** @returns {number} ms per step this round: speeds up each round, never below minStepMs. */
         function stepMs() {
             return Math.max(cfg.minStepMs, cfg.startStepMs - sequence.length * cfg.speedUpPerRound);
         }
 
+        /** Play back the whole sequence (steps 1.25 × stepMs apart), then hand over to the player. */
         function playSequence() {
             accepting = false;
             input = 0;
@@ -79,12 +98,18 @@ window.Games.simon = {
             later(() => { accepting = true; status.textContent = 'Your turn.'; }, 500 + sequence.length * ms * 1.25);
         }
 
+        /** Add one random pad to the sequence and play it. */
         function nextRound() {
             sequence.push(Math.floor(Math.random() * cfg.pads.length));
             roundEl.textContent = 'Round ' + sequence.length;
             playSequence();
         }
 
+        /**
+         * The player pressed pad i (by click or the 1–4 keys). A wrong pad ends the game; finishing
+         * the sequence saves the best round, awards the star at starRound, and starts the next round.
+         * @param {number} i
+         */
         function choose(i) {
             if (!accepting) return;
             flash(i, 220);
@@ -114,6 +139,7 @@ window.Games.simon = {
             nextRound();
         });
 
+        /** Keys 1–4 press the matching pad. @param {KeyboardEvent} e */
         function onKey(e) {
             const i = cfg.pads.findIndex((p) => p.key === e.key);
             if (i >= 0) { e.preventDefault(); choose(i); }

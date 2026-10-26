@@ -1,3 +1,24 @@
+/**
+ * game.js — Brick Breaker, the game on Game.html (unlocked by breaking every skill chip on the front page).
+ *
+ * Classic breakout on a fixed 800×500 canvas: move the paddle with ←/→ or A/D, or with the mouse/finger;
+ * the ball bounces off walls, the paddle and bricks. Clear all 35 bricks to win (and earn the 'bricks'
+ * star the first time); lose all 3 lives and it's game over.
+ *
+ * State machine (see setState):
+ *   idle ──Start──▶ running ◀──Pause/Resume──▶ paused
+ *                      │
+ *                      ├── all bricks gone ──▶ won  ──Play Again──▶ running
+ *                      └── lives reach 0   ──▶ lost ──Play Again──▶ running
+ *
+ * Movement uses pixels per second scaled by the frame time (dt), so speed doesn't depend on the
+ * monitor's refresh rate.
+ *
+ * Load order: after rewards.js on Game.html (Rewards is optional; every use is guarded).
+ * Depends on: #gameCanvas, #startGame, #pauseGame, #resetGame, #score and #lives in Game.html;
+ *             the --bg/--text theme tokens for the message overlay.
+ */
+
 // Game variables
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -41,13 +62,17 @@ const brickPadding = 10;
 const brickOffsetTop = 30;
 const brickOffsetLeft = (canvas.width - (brickColumnCount * (brickWidth + brickPadding) - brickPadding)) / 2;
 
-// helper function for colorful bricks
+/**
+ * Helper function for colourful bricks.
+ * @returns {string} a random #RRGGBB colour.
+ */
 function getRandomBrickColor() {
     const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
     return randomColor;
 }
 
-// Create bricks (positions are fixed, so collision never depends on drawing first)
+// Create bricks (positions are fixed, so collision never depends on drawing first).
+// Indexed bricks[column][row]; status 1 = standing, 0 = broken.
 const bricks = Array.from({ length: brickColumnCount }, (_, c) =>
     Array.from({ length: brickRowCount }, (_, r) =>
         ({
@@ -58,7 +83,12 @@ const bricks = Array.from({ length: brickColumnCount }, (_, c) =>
         }))
 );
 
-// Colours come from the site theme so the board matches light/dark mode
+/**
+ * Colours come from the site theme so the board matches light/dark mode.
+ * @param {string} name      CSS custom property, e.g. '--bg'.
+ * @param {string} fallback  used if the property isn't set.
+ * @returns {string}
+ */
 function themeColor(name, fallback) {
     return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback;
 }
@@ -86,11 +116,13 @@ canvas.addEventListener('pointermove', (e) => {
 let rightPressed = false;
 let leftPressed = false;
 
+/** Forget held keys, so the paddle doesn't keep sliding after focus changes or a restart. */
 function releaseKeys() {
     rightPressed = false;
     leftPressed = false;
 }
 
+/** Stop moving when ←/→ or A/D is released. @param {KeyboardEvent} e */
 function keyUpHandler(e) {
     if (e.key === 'Right' || e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
         rightPressed = false;
@@ -99,6 +131,10 @@ function keyUpHandler(e) {
     }
 }
 
+/**
+ * Start moving on ←/→ or A/D. While a game is running the arrow keys don't scroll the page.
+ * @param {KeyboardEvent} e
+ */
 function keyDownHandler(e) {
     if (e.key === 'Right' || e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
         rightPressed = true;
@@ -116,6 +152,7 @@ function startGame() {
     newGame();
 }
 
+/** Reset score, lives, ball, paddle and bricks, then start the loop. */
 function newGame() {
     cancelAnimationFrame(animationFrameId);
     score = 0;
@@ -145,6 +182,7 @@ function pauseGame() {
     }
 }
 
+/** "Reset Game" button: restart from scratch, whatever the current state. */
 function resetGame() {
     newGame();
 }
@@ -164,6 +202,11 @@ function toIdle() {
     draw();
 }
 
+/**
+ * Change state and keep the buttons in sync: Pause only works while playing, and Start reads
+ * "Play Again" after a win or loss.
+ * @param {'idle'|'running'|'paused'|'won'|'lost'} next
+ */
 function setState(next) {
     state = next;
     pauseButton.disabled = !(state === 'running' || state === 'paused');
@@ -171,6 +214,7 @@ function setState(next) {
     startButton.textContent = (state === 'won' || state === 'lost') ? 'Play Again' : 'Start Game';
 }
 
+/** Put the ball just above the paddle, heading up at a slightly random angle (±0.3 rad from vertical). */
 function resetBall() {
     ballX = canvas.width / 2;
     ballY = canvas.height - 40;
@@ -180,10 +224,12 @@ function resetBall() {
     ballDY = Math.sin(angle) * ballSpeed;
 }
 
+/** Centre the paddle. */
 function resetPaddle() {
     paddleX = (canvas.width - paddleWidth) / 2;
 }
 
+/** Stand every brick back up with a fresh random colour. */
 function resetBricks() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
@@ -193,6 +239,7 @@ function resetBricks() {
     }
 }
 
+/** @returns {number} how many bricks are still standing. */
 function bricksLeft() {
     let count = 0;
     for (let c = 0; c < brickColumnCount; c++) {
@@ -203,7 +250,10 @@ function bricksLeft() {
     return count;
 }
 
-// Collision detection: circle vs. rectangle, bouncing off the side it actually hit
+// Collision detection: circle vs. rectangle, bouncing off the side it actually hit.
+// Finds the point on the brick nearest the ball's centre; if that's within the radius, it's a hit.
+// The larger of the two offsets tells us which face was struck: a horizontal offset means a side hit
+// (flip DX), a vertical one means a top/bottom hit (flip DY).
 function collisionDetection() {
     for (let c = 0; c < brickColumnCount; c++) {
         for (let r = 0; r < brickRowCount; r++) {
@@ -257,7 +307,11 @@ function drawBricks() {
     }
 }
 
-// Big message in the middle of the board (theme text on theme background, AAA contrast)
+/**
+ * Big message in the middle of the board (theme text on theme background, AAA contrast).
+ * @param {string} title
+ * @param {string} subtitle
+ */
 function drawMessage(title, subtitle) {
     ctx.fillStyle = themeColor('--bg', '#1D1814');
     ctx.globalAlpha = 0.9;
@@ -271,6 +325,7 @@ function drawMessage(title, subtitle) {
     ctx.fillText(subtitle, canvas.width / 2, canvas.height / 2 + 32);
 }
 
+/** Draw one frame: bricks, ball, paddle, then the overlay message for the current state (if any). */
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBricks();
@@ -282,6 +337,7 @@ function draw() {
     else if (state === 'lost') drawMessage('Game over', `Score: ${score}`);
 }
 
+/** All bricks cleared: stop, award the 'bricks' star the first time, and show a toast linking home. */
 function winGame() {
     setState('won');
     releaseKeys();
@@ -297,6 +353,7 @@ function winGame() {
     }
 }
 
+/** Out of lives: stop and tell the player their score. */
 function loseGame() {
     setState('lost');
     releaseKeys();
@@ -306,7 +363,12 @@ function loseGame() {
     }
 }
 
-// Main game loop
+/**
+ * Main game loop, one call per animation frame while running.
+ * Order: paddle → ball → walls → paddle bounce / lost life → bricks → win check → draw.
+ * dt is capped at 33 ms so a hitch (or a backgrounded tab) can't tunnel the ball through a brick.
+ * @param {number} now  requestAnimationFrame timestamp in ms.
+ */
 function gameLoop(now) {
     if (state !== 'running') return;
     const dt = Math.min(0.033, (now - lastTime) / 1000); // seconds since last frame, capped
@@ -333,7 +395,8 @@ function gameLoop(now) {
     const paddleTop = canvas.height - paddleHeight;
     if (ballDY > 0 && ballY + ballRadius >= paddleTop && ballY < paddleTop + paddleHeight &&
         ballX > paddleX - ballRadius && ballX < paddleX + paddleWidth + ballRadius) {
-        // Adjust ball direction based on where it hits the paddle (-1 left edge .. 1 right edge)
+        // Adjust ball direction based on where it hits the paddle (-1 left edge .. 1 right edge).
+        // That maps to up to 60° either side of straight up, so players can aim; speed stays constant.
         const hitPosition = ((ballX - paddleX) / paddleWidth) * 2 - 1;
         const angle = Math.max(-1, Math.min(1, hitPosition)) * (Math.PI / 3);
         ballDX = Math.sin(angle) * ballSpeed;

@@ -1,6 +1,13 @@
 // === Worm ===
 // Guide the worm to the apples. Don't bump into yourself or the walls.
 // Room to grow: obstacles, levels, power-ups (slow-mo, ghost), wrap-around mode.
+//
+// Unlock: spell WORM with the hero letters (js/secrets.js). Star: eat config.starApples in one game.
+// Registers window.Games.worm following the mini-game contract (js/secrets.js, docs/ARCHITECTURE.md).
+// Best score is stored as localStorage 'best_worm' (most apples in one game).
+//
+// Timing: a fixed-step loop. requestAnimationFrame accumulates real time in `acc` and runs step()
+// once per tickMs, so the worm moves at the same speed on any monitor; it draws every frame.
 window.Games = window.Games || {};
 
 window.Games.worm = {
@@ -17,6 +24,12 @@ window.Games.worm = {
         starApples: 15       // eat this many in one game to earn the star (keep js/rewards.js text in sync)
     },
 
+    /**
+     * Build the game inside the dialog.
+     * @param {HTMLElement} root  empty container to render into.
+     * @param {Object} api        shared helpers from js/secrets.js (el, best, tone, css, star).
+     * @returns {Function} cleanup: stops the loop and removes the key listener.
+     */
     mount(root, api) {
         const cfg = this.config;
         const canvas = api.el('canvas', { className: 'worm-canvas', width: 432, height: 432 });
@@ -50,9 +63,14 @@ window.Games.worm = {
             api.el('p', { className: 'game-help', textContent: 'Arrow keys or WASD to steer, Space to pause. Swipe on touch screens.' })
         );
 
+        // Grid offsets per direction. y grows downward, like the canvas.
         const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+        // worm: [{x,y}] cells, head first. dir: direction of the last move. nextDir: queued turn,
+        // applied on the next step (so two quick key presses can't reverse the worm into itself).
+        // acc/last: ms accumulator and last frame time for the fixed-step loop. raf: animation frame id.
         let worm, dir, nextDir, apple, score, tickMs, running, paused, acc, last, raf;
 
+        /** New worm in the middle facing right, score 0, starting speed, fresh apple. */
         function reset() {
             const mid = Math.floor(cfg.grid / 2);
             worm = Array.from({ length: cfg.startLength }, (_, i) => ({ x: mid - i, y: mid }));
@@ -64,12 +82,17 @@ window.Games.worm = {
             scoreEl.textContent = 'Apples 0';
         }
 
+        /** Put the apple on a random cell the worm isn't on. */
         function placeApple() {
             do {
                 apple = { x: Math.floor(Math.random() * cfg.grid), y: Math.floor(Math.random() * cfg.grid) };
             } while (worm.some((s) => s.x === apple.x && s.y === apple.y));
         }
 
+        /**
+         * Queue a turn (any input also starts the game). U-turns are ignored.
+         * @param {'up'|'down'|'left'|'right'} d
+         */
         function turn(d) {
             if (!running) start();
             const [dx, dy] = DIRS[d];
@@ -78,6 +101,10 @@ window.Games.worm = {
             nextDir = d;
         }
 
+        /**
+         * Advance one cell: add a new head, then either grow (ate the apple: score, speed up, maybe
+         * award the star) or drop the tail. Hitting a wall (unless wrapWalls) or itself ends the game.
+         */
         function step() {
             dir = nextDir;
             const [dx, dy] = DIRS[dir];
@@ -103,6 +130,7 @@ window.Games.worm = {
             }
         }
 
+        /** Paint the board (theme-coloured checkerboard), the apple, the worm and its eyes. */
         function draw() {
             ctx.fillStyle = api.css('--surface-2');
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -127,6 +155,7 @@ window.Games.worm = {
                 ctx.roundRect(s.x * cell + pad, s.y * cell + pad, cell - pad * 2, cell - pad * 2, cell * .4);
                 ctx.fill();
             });
+            // Eyes: two dots nudged toward the direction of travel, one each side of the head
             const h = worm[0];
             ctx.fillStyle = '#2B2019';
             const [dx, dy] = DIRS[dir];
@@ -137,6 +166,7 @@ window.Games.worm = {
             });
         }
 
+        /** Fixed-step game loop (see the timing note at the top of the file). @param {number} now */
         function loop(now) {
             if (!running) return;
             if (!paused) {
@@ -148,6 +178,7 @@ window.Games.worm = {
             raf = requestAnimationFrame(loop);
         }
 
+        /** Start, or restart, a game. */
         function start() {
             reset();
             running = true;
@@ -159,6 +190,7 @@ window.Games.worm = {
             raf = requestAnimationFrame(loop);
         }
 
+        /** Stop, save the best score, and explain what happened. @param {string} reason */
         function gameOver(reason) {
             running = false;
             bestEl.textContent = 'Best ' + api.best('worm', score);
@@ -167,6 +199,7 @@ window.Games.worm = {
             draw();
         }
 
+        /** Space / tap: start if stopped, otherwise pause or resume. */
         function togglePause() {
             if (!running) return start();
             paused = !paused;
@@ -175,12 +208,17 @@ window.Games.worm = {
 
         const KEYS = { ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down',
                        ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right' };
+        /**
+         * Arrows/WASD steer; Space pauses, except when a button has focus, where Space should press it.
+         * @param {KeyboardEvent} e
+         */
         function onKey(e) {
             if (KEYS[e.key]) { e.preventDefault(); turn(KEYS[e.key]); }
             else if (e.key === ' ' && e.target.tagName !== 'BUTTON') { e.preventDefault(); togglePause(); }
         }
         document.addEventListener('keydown', onKey);
 
+        // Touch/mouse swipes: the longer axis of the drag picks the direction; a tap (< 20 px) pauses
         let touch = null;
         canvas.addEventListener('pointerdown', (e) => { touch = { x: e.clientX, y: e.clientY }; });
         canvas.addEventListener('pointerup', (e) => {

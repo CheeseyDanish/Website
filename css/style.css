@@ -3,6 +3,21 @@
    Every text colour below is checked against WCAG AAA (7:1)
    on every background it is used on. If you add a colour,
    check it at https://webaim.org/resources/contrastchecker/
+
+   Used by every page. Bump ?v= on its <link> tags (index.html,
+   Game.html, Tidewall.html) after editing, so browsers refetch it.
+
+   Theming: components only use the custom properties below
+   (--bg, --surface, --text, --accent…). body.dark-mode swaps
+   them all, so components never need their own dark variants.
+
+   Contents (search for "=== Name ==="):
+     Base · Links · Buttons · Navbar · Hero · Sections ·
+     Cards / timeline · Skills · 3D models · Contact · Footer ·
+     Secret game dialog (+ Simon, Worm, Mines) ·
+     Brick Breaker page · Projects · Tidewall page · Toasts ·
+     Stars · Motion preferences
+   Keyframe animations live in css/animations.css.
    ========================================================= */
 
 /* --- Light theme ("Daylight") --- */
@@ -727,7 +742,8 @@ main { display: block; }
 .tidewall-info h2 { font-size: 1.35rem; }
 .tidewall-keys { list-style: none; padding: 0; margin: 0; display: grid; gap: .55rem; color: var(--muted); }
 
-kbd {
+/* Scoped to the Tidewall controls list: Simon's pads have their own kbd style */
+.tidewall-keys kbd {
     display: inline-block;
     min-width: 1.6em;
     padding: .05rem .45rem;

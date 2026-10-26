@@ -1,6 +1,14 @@
 // === Mines ===
 // Classic minesweeper: open every safe tile. Numbers count the mines touching a tile.
 // Room to grow: more difficulty presets, a timer leaderboard, chording, hex boards.
+//
+// Unlock: spell MINES with the hero letters (js/secrets.js). Star: clear any board.
+// Registers window.Games.mines following the mini-game contract (js/secrets.js, docs/ARCHITECTURE.md).
+// Total wins are stored as localStorage 'best_mines_wins' (via api.best, which only ever increases).
+//
+// The board is a grid of real <button>s (role="grid") with a roving tabindex, so it works fully
+// from the keyboard and with screen readers. Cells are stored in one flat array; index i is
+// row floor(i / size), column i % size.
 window.Games = window.Games || {};
 
 window.Games.mines = {
@@ -15,10 +23,18 @@ window.Games.mines = {
         start: 'Cozy'
     },
 
+    /**
+     * Build the game inside the dialog.
+     * @param {HTMLElement} root  empty container to render into.
+     * @param {Object} api        shared helpers from js/secrets.js (el, best, tone, css, star).
+     * @returns {null} nothing to clean up: no timers or document-level listeners.
+     */
     mount(root, api) {
         const cfg = this.config;
         let level = cfg.difficulties[cfg.start];
         let levelName = cfg.start;
+        // cells: [{ btn, mine, open, flag, count }]. firstClick: mines aren't placed until then.
+        // over: game finished. opened: safe cells revealed (the game is won at size² − mines).
         let cells, firstClick, over, opened, flagMode = false;
 
         const minesEl = api.el('span');
@@ -40,6 +56,7 @@ window.Games.mines = {
             api.el('p', { className: 'game-help', textContent: 'Click to open. Right-click (or turn on Flag mode) to mark a mine. Arrow keys move, Enter opens, F flags.' })
         );
 
+        /** @param {number} i @returns {number[]} indexes of the up-to-8 cells touching cell i. */
         function neighbours(i) {
             const n = level.size, x = i % n, y = Math.floor(i / n), out = [];
             for (let dy = -1; dy <= 1; dy++)
@@ -50,6 +67,7 @@ window.Games.mines = {
             return out;
         }
 
+        /** (Re)create an empty board for the current difficulty. Mines are laid on the first reveal. */
         function build() {
             const n = level.size;
             levelBtn.textContent = 'Size: ' + levelName;
@@ -72,6 +90,11 @@ window.Games.mines = {
             status.textContent = 'Your first click is always safe.';
         }
 
+        /**
+         * Place the mines randomly, never on the first-clicked cell or its neighbours (so the first
+         * click always opens an area), then work out every cell's neighbour count.
+         * @param {number} safe  index of the first-clicked cell.
+         */
         function layMines(safe) {
             const banned = new Set([safe, ...neighbours(safe)]);
             let placed = 0;
@@ -84,11 +107,17 @@ window.Games.mines = {
             cells.forEach((c, i) => { c.count = neighbours(i).filter((j) => cells[j].mine).length; });
         }
 
+        /** @param {number} i @returns {string} "Row r, column c" for screen-reader labels. */
         function label(i) {
             const n = level.size;
             return `Row ${Math.floor(i / n) + 1}, column ${(i % n) + 1}`;
         }
 
+        /**
+         * Open cell i. A mine loses the game. A zero cell flood-opens its whole empty region plus the
+         * numbered border (iterative stack, so big boards can't overflow the call stack).
+         * @param {number} i
+         */
         function reveal(i) {
             const c = cells[i];
             if (over || c.open || c.flag) return;
@@ -112,6 +141,7 @@ window.Games.mines = {
             if (opened === cells.length - level.mines) win();
         }
 
+        /** Toggle a flag on a hidden cell. Flagged cells can't be opened by accident. @param {number} i */
         function flag(i) {
             const c = cells[i];
             if (over || c.open) return;
@@ -122,17 +152,20 @@ window.Games.mines = {
             updateCounter();
         }
 
+        /** "Mines N": total mines minus flags placed (can go negative if you over-flag). */
         function updateCounter() {
             const flags = cells.filter((c) => c.flag).length;
             minesEl.textContent = `Mines ${level.mines - flags}`;
         }
 
+        /** At game end, show every unflagged mine. */
         function showMines() {
             cells.forEach((c) => {
                 if (c.mine && !c.flag) { c.btn.textContent = '●'; c.btn.classList.add('open'); }
             });
         }
 
+        /** Opened a mine at i: end the game and highlight it. @param {number} i */
         function lose(i) {
             over = true;
             showMines();
@@ -141,6 +174,7 @@ window.Games.mines = {
             api.tone(120, .5);
         }
 
+        /** Every safe cell is open: count the win and award the star (only the first time counts). */
         function win() {
             over = true;
             showMines();
@@ -151,7 +185,9 @@ window.Games.mines = {
             api.star('mines');
         }
 
-        // Roving focus so the whole board is one tab stop
+        // Roving focus so the whole board is one tab stop.
+        // Arrows move focus between cells (without wrapping to the next row), F toggles a flag,
+        // and Enter/Space open the cell through the button's normal click.
         function onCellKey(e, i) {
             const n = level.size;
             const moves = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: n, ArrowUp: -n };
