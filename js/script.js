@@ -55,6 +55,28 @@ themeToggle.addEventListener('click', () => {
     Store.set('darkMode', isDark);
 });
 
+// === Mobile menu ===
+// Under 720px the nav links fold into a dropdown opened by #nav-toggle (css/style.css, "Navbar").
+// Picking a link, pressing Escape, or tapping outside closes it again.
+const navToggle = document.getElementById('nav-toggle');
+const navLinks = document.getElementById('nav-links');
+if (navToggle && navLinks) {
+    const setMenu = (open) => {
+        navLinks.classList.toggle('open', open);
+        navToggle.setAttribute('aria-expanded', String(open));
+        navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        navToggle.querySelector('i').className = open ? 'fas fa-xmark' : 'fas fa-bars';
+    };
+    navToggle.addEventListener('click', () => setMenu(!navLinks.classList.contains('open')));
+    navLinks.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navLinks.classList.contains('open')) { setMenu(false); navToggle.focus(); }
+    });
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.navbar')) setMenu(false);
+    });
+}
+
 // === Footer year ===
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();

@@ -16,7 +16,7 @@
 // After re-exporting a model, bump MODEL_VERSION so browsers don't show a cached copy.
 
 /** Appended to every model URL as ?v=N to bust browser caches after a re-export. */
-const MODEL_VERSION = 2;
+const MODEL_VERSION = 3;
 
 /**
  * @typedef {Object} ModelEntry
@@ -82,24 +82,17 @@ const MODELS = [
     {
         title: 'Donut',
         file: 'assets/models/donut.glb',
-        size: '80 KB',
+        size: '75 KB',
         autoload: true,
-        description: 'My take on the classic Blender donut, with drippy icing.',
-        alt: 'A 3D model of a donut with pink icing'
+        description: 'My take on the classic Blender donut, with drippy icing and sprinkles.',
+        alt: 'A 3D model of a golden donut with pink icing and rainbow sprinkles'
     },
     {
-        title: 'Bird',
-        file: 'assets/models/bird.glb',
-        size: '0.4 MB',
-        description: 'A small, stylised bird sculpt.',
-        alt: 'A 3D model of a small bird'
-    },
-    {
-        title: 'Glizzy Monster',
-        file: 'assets/models/glizzymonster.glb',
-        size: '2.1 MB',
-        description: 'A goofy character sculpt.',
-        alt: 'A 3D model of a cartoon monster character'
+        title: 'Spiny Lizard',
+        file: 'assets/models/lizard.glb',
+        size: '0.8 MB',
+        description: 'A stylised spiny lizard sculpt with mottled, vertex-painted scales.',
+        alt: 'A 3D model of a green spiny lizard with orange-tipped spikes'
     }
 ];
 

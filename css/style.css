@@ -197,9 +197,27 @@ a:hover { text-decoration-thickness: 2px; }
 }
 .theme-btn:hover { transform: rotate(-15deg); border-color: var(--accent); }
 
+/* Menu button: only shown on narrow screens, where the links fold into a dropdown */
+.nav-toggle { display: none; }
+
 @media (max-width: 720px) {
-    .nav-links { display: none; }
     .nav-brand { margin-right: auto; }
+    .nav-toggle { display: grid; }
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        flex-direction: column;
+        gap: 0;
+        margin: 0;
+        padding: .5rem clamp(1rem, 4vw, 3rem) 1rem;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        box-shadow: var(--shadow);
+    }
+    .nav-links.open { display: flex; }
+    .nav-links a { display: block; padding: .75rem 0; font-size: 1.1rem; }
+    .nav-links li + li { border-top: 1px solid var(--border); }
 }
 
 /* === Hero === */
@@ -672,6 +690,13 @@ main { display: block; }
     .project-card { flex-direction: row; }
     .project-card .project-banner { flex: 0 0 44%; aspect-ratio: auto; min-height: 280px; }
 }
+
+/* Smaller project cards (no banner), in a responsive grid under the featured one */
+.projects-grid.compact {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    margin-top: 1.5rem;
+}
+.projects-grid.compact .project-card { flex-direction: column; }
 
 /* Decorative night-sea banner; no text sits on it */
 .project-banner {

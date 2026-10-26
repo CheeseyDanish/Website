@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=5">
+    <link rel="stylesheet" href="css/style.css?v=6">
     <link rel="stylesheet" href="css/animations.css?v=3">
     <!-- 3D viewer: works in Firefox, Chrome, Edge and Safari -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
@@ -21,15 +21,19 @@
 
     <nav class="navbar" aria-label="Main">
         <a class="nav-brand" href="#top">Andrew Simon</a>
-        <ul class="nav-links">
+        <ul class="nav-links" id="nav-links">
             <li><a href="#education">Education</a></li>
             <li><a href="#experience">Experience</a></li>
+            <li><a href="#skills">Skills</a></li>
             <li><a href="#projects">Projects</a></li>
             <li><a href="#models">3D Work</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
         <button id="theme-toggle" class="theme-btn" type="button" aria-label="Switch to light theme">
             <i class="fas fa-sun" aria-hidden="true"></i>
+        </button>
+        <button id="nav-toggle" class="theme-btn nav-toggle" type="button" aria-controls="nav-links" aria-expanded="false" aria-label="Open menu">
+            <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
     </nav>
 
@@ -65,10 +69,10 @@
             <div class="timeline">
                 <article class="timeline-item reveal">
                     <h3>University of Windsor</h3>
-                    <p class="date">Sept 2020 – Sept 2024</p>
+                    <p class="date">Oct 2020 – Oct 2024</p>
                     <p class="description">
-                        I have a Bachelor's in Computer Science: Applied Computing with Honours, focusing on software development
-                        and network systems design. Key coursework includes advanced algorithms, distributed
+                        I have a Bachelor's in Computer Science: Applied Computing with Honours, focusing on software development,
+                        networking, and systems design. Key coursework includes advanced algorithms, distributed
                         systems, and machine learning fundamentals.
                     </p>
                     <p class="description" style="margin-top:1rem">
@@ -93,20 +97,29 @@
             </div>
             <div class="timeline">
                 <article class="timeline-item reveal">
+                    <h3>Pharmacy Assistant</h3>
+                    <p class="date">Oct 2025 – Present · Leamington Wellness Pharmacy</p>
+                    <p class="description">
+                        Enter and verify prescription and patient data, process electronic insurance claims,
+                        and manage medication inventory, where every record has to be exactly right.
+                        Handle confidential health information every day.
+                    </p>
+                </article>
+                <article class="timeline-item reveal">
                     <h3>AI Writing Evaluator</h3>
                     <p class="date">May 2024 – Jul 2024 · Outlier</p>
                     <p class="description">
-                        Evaluated and improved AI-generated content quality, working closely with
-                        NLP algorithms and machine learning models to enhance writing mechanics.
+                        Evaluated AI-generated writing for accuracy and clarity against detailed quality guidelines,
+                        and wrote structured feedback used to improve the model's output.
                     </p>
                 </article>
                 <article class="timeline-item reveal">
                     <h3>IT Support Co-op</h3>
-                    <p class="date">Jan 2020 – Apr 2020</p>
+                    <p class="date">Jan 2020 – Apr 2020 · SX Communications</p>
                     <p class="description">
-                        Installed and configured Windows operating systems on newly assembled computers.
-                        Built and tested custom computer setups, ensuring hardware and software functionality.
-                        Measured, cut, and fabricated pipes for store use.
+                        Installed and configured Windows on newly assembled computers, then built and tested
+                        custom setups to make sure the hardware and software worked. Diagnosed hardware and software
+                        issues and supported communication systems for local businesses.
                     </p>
                 </article>
             </div>
@@ -124,6 +137,14 @@
                 <li class="skill-chip"><i class="fab fa-css3-alt" aria-hidden="true"></i> CSS</li>
                 <li class="skill-chip"><i class="fas fa-hashtag" aria-hidden="true"></i> C#</li>
                 <li class="skill-chip"><i class="fas fa-code" aria-hidden="true"></i> C++</li>
+                <li class="skill-chip"><i class="fab fa-java" aria-hidden="true"></i> Java</li>
+                <li class="skill-chip"><i class="fas fa-database" aria-hidden="true"></i> SQL</li>
+                <li class="skill-chip"><i class="fas fa-chart-column" aria-hidden="true"></i> Power BI</li>
+                <li class="skill-chip"><i class="fas fa-network-wired" aria-hidden="true"></i> Networking</li>
+                <li class="skill-chip"><i class="fab fa-linux" aria-hidden="true"></i> Linux / CLI</li>
+                <li class="skill-chip"><i class="fab fa-git-alt" aria-hidden="true"></i> Git</li>
+                <li class="skill-chip"><i class="fab fa-microsoft" aria-hidden="true"></i> Azure DevOps</li>
+                <li class="skill-chip"><i class="fab fa-unity" aria-hidden="true"></i> Unity</li>
                 <li class="skill-chip"><i class="fas fa-cube" aria-hidden="true"></i> Blender</li>
             </ul>
         </section>
@@ -132,7 +153,7 @@
         <section id="projects" class="section alt">
             <div class="section-head reveal">
                 <h2 class="section-title">Projects</h2>
-                <p class="section-lede">Things I've built that you can try right here in the browser.</p>
+                <p class="section-lede">Things I've built, from networked software to dashboards. Some you can try right here in the browser.</p>
             </div>
             <div class="projects-grid">
                 <article class="card project-card reveal">
@@ -148,6 +169,83 @@
                         </ul>
                         <div class="project-actions">
                             <a href="Tidewall.html" class="btn btn-primary btn-small"><i class="fas fa-play" aria-hidden="true"></i> Play Tidewall</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            <div class="projects-grid compact">
+                <article class="card project-card reveal">
+                    <div class="project-body">
+                        <h3>Student Sync</h3>
+                        <p class="description">A client-server Windows app that lets educators watch live streams of their students' screens. My university final project, built with a partner. I wrote the TCP client-server messaging, multi-monitor screen capture, parts of the GUI, and the FFmpeg setup for H.264 video.</p>
+                        <ul class="project-tags" aria-label="Built with">
+                            <li>C++</li>
+                            <li>TCP sockets</li>
+                            <li>Win32</li>
+                            <li>FFmpeg</li>
+                            <li>CMake</li>
+                        </ul>
+                        <div class="project-actions">
+                            <a href="https://github.com/kilbouri/student-sync" class="btn btn-ghost btn-small" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i> View code</a>
+                        </div>
+                    </div>
+                </article>
+                <article class="card project-card reveal">
+                    <div class="project-body">
+                        <h3>Sales Dashboard</h3>
+                        <p class="description">An interactive Power BI report built on Microsoft's Financial Sample data. It tracks profit by month, by country on a map, and sales vs. profit by segment, with a date table and a year/month slicer.</p>
+                        <ul class="project-tags" aria-label="Built with">
+                            <li>Power BI</li>
+                            <li>Data modelling</li>
+                            <li>Excel</li>
+                        </ul>
+                        <div class="project-actions">
+                            <a href="assets/powerbi/sales-dashboard.pbix" class="btn btn-ghost btn-small" download><i class="fas fa-file-arrow-down" aria-hidden="true"></i> Report (.pbix)</a>
+                            <a href="assets/powerbi/financial-sample.xlsx" class="btn btn-ghost btn-small" download><i class="fas fa-table" aria-hidden="true"></i> Data (.xlsx)</a>
+                        </div>
+                    </div>
+                </article>
+                <article class="card project-card reveal">
+                    <div class="project-body">
+                        <h3>Bookstore Database</h3>
+                        <p class="description">A bookstore ordering app backed by a SQL Server database, built by an Agile team in Azure DevOps. I connected the app to the right database in Azure with a teammate, tested it, and gave the final presentation.</p>
+                        <ul class="project-tags" aria-label="Built with">
+                            <li>C#</li>
+                            <li>WPF</li>
+                            <li>SQL Server</li>
+                            <li>Azure DevOps</li>
+                        </ul>
+                        <div class="project-actions">
+                            <a href="https://github.com/Hedges07/Group-Project-4220" class="btn btn-ghost btn-small" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i> View code</a>
+                        </div>
+                    </div>
+                </article>
+                <article class="card project-card reveal">
+                    <div class="project-body">
+                        <h3>TideWall 3D</h3>
+                        <p class="description">The 3D follow-up to Tidewall: a co-op roguelike for up to four players in split screen or online, over its own host/client networking layer. It has a save system, automated tests, and a Python script that generates every model in Blender.</p>
+                        <ul class="project-tags" aria-label="Built with">
+                            <li>C#</li>
+                            <li>Unity 6</li>
+                            <li>Networking</li>
+                            <li>Python</li>
+                        </ul>
+                        <div class="project-actions">
+                            <a href="https://github.com/CheeseyDanish/TideFall" class="btn btn-ghost btn-small" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i> View code</a>
+                        </div>
+                    </div>
+                </article>
+                <article class="card project-card reveal">
+                    <div class="project-body">
+                        <h3>Android Publishing App</h3>
+                        <p class="description">A course project with a team of three. I set up the Android project, login screen and navigation, and prepared the WordPress REST API route for publishing posts from the app.</p>
+                        <ul class="project-tags" aria-label="Built with">
+                            <li>Java</li>
+                            <li>Android</li>
+                            <li>REST API</li>
+                        </ul>
+                        <div class="project-actions">
+                            <a href="https://github.com/CheeseyDanish/Comp_4200_Project" class="btn btn-ghost btn-small" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i> View code</a>
                         </div>
                     </div>
                 </article>
@@ -210,8 +308,8 @@
         <div class="game-root" id="game-root"></div>
     </dialog>
 
-    <script src="js/script.js?v=2"></script>
-    <script src="js/models.js?v=3"></script>
+    <script src="js/script.js?v=3"></script>
+    <script src="js/models.js?v=4"></script>
     <script src="js/rewards.js?v=1"></script>
     <script src="js/games/simon.js?v=3"></script>
     <script src="js/games/worm.js?v=3"></script>
