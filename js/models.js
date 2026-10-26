@@ -2,6 +2,8 @@
 // To add a model: export it from Blender as glTF Binary (.glb, Draco compression on)
 // into assets/models/, then add an entry below.
 // Small files (autoload: true) load as they scroll into view; bigger ones wait for a "Load" click.
+// After re-exporting a model, bump MODEL_VERSION so browsers don't show a cached copy.
+const MODEL_VERSION = 2;
 const MODELS = [
     {
         title: 'Burger',
@@ -82,7 +84,7 @@ const MODELS = [
 
     function showViewer(model, stage, poster) {
         const viewer = document.createElement('model-viewer');
-        viewer.setAttribute('src', model.file);
+        viewer.setAttribute('src', `${model.file}?v=${MODEL_VERSION}`);
         viewer.setAttribute('alt', model.alt);
         viewer.setAttribute('loading', 'lazy');
         viewer.setAttribute('camera-controls', '');
