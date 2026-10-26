@@ -60,7 +60,7 @@ Website/
 │       ├── simon.js
 │       ├── worm.js
 │       └── mines.js
-├── tidewall/           Copy of the Tidewall game (see "Updating Tidewall")
+├── tidewall/           Tidewall 2D: source, design docs (docs/) and rules (CLAUDE.md)
 └── assets/
     ├── models/*.glb    3D models (glTF binary, Draco-compressed)
     ├── resume.pdf
@@ -129,8 +129,8 @@ Colours are custom properties at the top of `css/style.css`, defined once for li
 
 The full `api` reference is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#the-mini-game-contract).
 
-### Updating Tidewall
-`tidewall/` is a copy of the `web/` folder from the separate **TideFall** repo; the game's own README and design docs live there. To update it, copy `index.html`, `style.css` and `js/` from `TideFall/web/` over `tidewall/` (leave out `serve.js`). The game keeps its save under `localStorage` keys starting with `tidewall.`, so it never collides with the site's keys.
+### Working on Tidewall 2D
+`tidewall/` is the home of the 2D game: its source (`index.html`, `style.css`, `js/`), its design documents (`tidewall/docs/`) and its rules (`tidewall/CLAUDE.md`). Edit it in place; there's nothing to copy. Run `node tidewall/serve.js` to test it on its own, and add `?dev` to the URL to load the balance bot. The game keeps its save under `localStorage` keys starting with `tidewall.`, so it never collides with the site's keys. The 3D version is a separate Unity project (the **TideWall** repo).
 
 ## Deployment
 

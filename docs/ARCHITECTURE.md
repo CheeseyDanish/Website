@@ -125,7 +125,7 @@ A self-contained page script. State machine: `idle → running ⇄ paused → wo
 
 ## Tidewall
 
-`Tidewall.html` embeds `tidewall/index.html` in a 16:9 `<iframe>`. The frame's width is capped so the whole game fits under the page header. The game is a separate project, copied from the TideFall repo, and documented there (`README.md`, `CLAUDE.md`, `docs/`). Keyboard input goes to the iframe once the visitor clicks into it; if focus leaves it mid-night, the game pauses itself.
+`Tidewall.html` embeds `tidewall/index.html` in a 16:9 `<iframe>`. The frame's width is capped so the whole game fits under the page header. The game's source, design docs (`tidewall/docs/`) and rules (`tidewall/CLAUDE.md`) all live in that folder. Keyboard input goes to the iframe once the visitor clicks into it; if focus leaves it mid-night, the game pauses itself.
 
 ## Caching
 
