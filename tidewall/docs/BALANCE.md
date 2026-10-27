@@ -61,7 +61,7 @@ Humans aim worse than the bot but prioritize better and use combos on purpose. I
 
 Upgrades: weapon tier cost is `max(200, price × 0.5) × currentTier`. Crew level cost is `hire × 0.8 × currentLevel`. Wall upgrades scale linearly with level. Repair costs 0.5 scrap per HP.
 
-Selling refunds **50%** of the total spent on that item (R8).
+Selling refunds **80%** of the total spent on that item (R8).
 
 ## DPS sanity bands (tier 1, no mods, sustained, including reloads)
 The Armory shows this number on every weapon card.
