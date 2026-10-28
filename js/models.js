@@ -56,6 +56,14 @@ const MODELS = [
         alt: 'A low-poly 3D red drink cup with a straw'
     },
     {
+        title: 'Soda Can',
+        file: 'assets/models/coke.glb',
+        size: '35 KB',
+        autoload: true,
+        description: 'A red soda can with a modelled pull tab.',
+        alt: 'A 3D red soda can with a silver lid and pull tab'
+    },
+    {
         title: 'Hot Dog',
         file: 'assets/models/hotdog.glb',
         size: '12 KB',

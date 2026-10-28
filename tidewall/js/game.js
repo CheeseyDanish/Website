@@ -1381,8 +1381,14 @@ function drawEnemy(ctx, e, t) {
     ctx.beginPath(); ctx.moveTo(b.l - 4, b.b); ctx.lineTo(b.l - 2, b.t - 4); ctx.lineTo(x, b.t - 10); ctx.lineTo(b.r + 2, b.t - 2); ctx.lineTo(b.r + 4, b.b); ctx.closePath(); ctx.fill(); ctx.stroke();
   }
   if (e.wet && e.frozen <= 0) {
-    ctx.strokeStyle = 'rgba(147,197,253,0.5)'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(b.l + 3, b.t + 6); ctx.lineTo(b.l + w * 0.4, b.t + 3); ctx.stroke();
+    // Wet: a couple of drips falling from the body's middle to the sand (the box's top corner is often empty air:
+    // shellbacks are low domes, eels thin wrigglers)
+    const midY = (b.t + b.b) / 2, fall = Math.max(4, b.b - midY);
+    ctx.fillStyle = 'rgba(147,197,253,0.7)';
+    for (let k = 0; k < 2; k++) {
+      const dx = b.l + w * (0.35 + 0.3 * k), dy = midY + ((t * 38 + k * 0.5 * fall + e.x) % fall);
+      ctx.fillRect(dx, dy, 1.5, 3);
+    }
   }
   if (e.stun > 0) {
     ctx.strokeStyle = '#a5f3fc'; ctx.lineWidth = 1.5; ctx.beginPath();
@@ -1447,14 +1453,22 @@ const DRAW = {
     ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(cx - r * 0.5, cy - r * 0.3, 2.5, 0, Math.PI * 2); ctx.fill();
   },
   eel(ctx, e, b, c) {
-    const n = 9;
-    for (let i = n - 1; i >= 0; i--) {
-      const f = i / (n - 1), px = b.l + 6 + f * (e.w - 10), py = (b.t + b.b) / 2 + Math.sin(e.anim * 10 - f * 5) * 5;
-      ctx.fillStyle = rgb(c, 1 - f * 0.3); ctx.beginPath(); ctx.arc(px, py, 7 - f * 4, 0, Math.PI * 2); ctx.fill();
+    // A tapering body of overlapping discs that wriggles; the glowing fin rides its back and moves with it
+    const n = 9, pts = [];
+    for (let i = 0; i < n; i++) {
+      const f = i / (n - 1);
+      pts.push({ x: b.l + 6 + f * (e.w - 10), y: (b.t + b.b) / 2 + Math.sin(e.anim * 10 - f * 5) * 5, r: 7 - f * 4, f });
     }
-    const hy = (b.t + b.b) / 2 + Math.sin(e.anim * 10) * 5;
-    ctx.fillStyle = '#a7f3d0'; ctx.beginPath(); ctx.arc(b.l + 4, hy - 2, 2.2, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#5eead4'; ctx.fillRect(b.l + 8, b.t + 2, 30, 1.5);
+    for (let i = n - 1; i >= 0; i--) {
+      const p = pts[i];
+      ctx.fillStyle = rgb(c, 1 - p.f * 0.3); ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.strokeStyle = '#5eead4'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (let i = 1; i < n - 1; i++) { const p = pts[i]; if (i === 1) ctx.moveTo(p.x, p.y - p.r + 0.5); else ctx.lineTo(p.x, p.y - p.r + 0.5); }
+    ctx.stroke(); ctx.lineCap = 'butt';
+    const hd = pts[0];
+    ctx.fillStyle = '#a7f3d0'; ctx.beginPath(); ctx.arc(hd.x - 2, hd.y - 2, 2.2, 0, Math.PI * 2); ctx.fill();
   },
   shellback(ctx, e, b, c, step) {
     const cx = e.x + 6, base = b.b - 8;
@@ -1488,12 +1502,20 @@ const DRAW = {
     ctx.fillStyle = rgb(c);
     for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.ellipse(cx + 18 + i * 9, base - 12 + i * 2, 12 - i * 2, 12 - i * 2, 0, 0, Math.PI * 2); ctx.fill(); }
     ctx.beginPath(); ctx.ellipse(cx - 6, base - 16, 26, 18, 0, 0, Math.PI * 2); ctx.fill();
+    // The head joins the body, carrying the eye stalks (the weak point) and the antennae
+    ctx.beginPath(); ctx.ellipse(b.l + 26, base - 20, 13, 11, -0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = rgb(c, 0.75); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(b.l + 16, base - 20); ctx.quadraticCurveTo(b.l - 4, base - 40, b.l - 22, base - 24);
+    ctx.moveTo(b.l + 17, base - 23); ctx.quadraticCurveTo(b.l, base - 50, b.l - 16, base - 40); ctx.stroke();
     const raise = e.swing > 0 ? -12 : 0;
+    // The arm from the body to the claw
+    ctx.strokeStyle = rgb(c, 0.9); ctx.lineWidth = 6; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(b.l + 30, base - 10); ctx.lineTo(b.l + 16, base - 8 + raise); ctx.stroke(); ctx.lineCap = 'butt';
     ctx.fillStyle = rgb(c, 1.1);
     ctx.beginPath(); ctx.ellipse(b.l + 12, base - 8 + raise, 14, 9, -0.4, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = rgb(c, 0.8); ctx.beginPath(); ctx.moveTo(b.l + 2, base - 14 + raise); ctx.lineTo(b.l - 8, base - 22 + raise); ctx.lineTo(b.l + 6, base - 10 + raise); ctx.fill();
     ctx.strokeStyle = rgb(c, 0.9); ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(b.l + 18, b.t + 14); ctx.lineTo(b.l + 10, b.t + 4); ctx.moveTo(b.l + 24, b.t + 14); ctx.lineTo(b.l + 22, b.t + 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(b.l + 20, base - 28); ctx.lineTo(b.l + 10, b.t + 4); ctx.moveTo(b.l + 26, base - 30); ctx.lineTo(b.l + 22, b.t + 2); ctx.stroke();
     ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(b.l + 10, b.t + 5, 3.5, 0, Math.PI * 2); ctx.arc(b.l + 22, b.t + 3, 3.5, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#fde047'; ctx.fillRect(b.l + 9, b.t + 4, 1.5, 1.5); ctx.fillRect(b.l + 21, b.t + 2, 1.5, 1.5);
   },
