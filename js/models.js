@@ -99,7 +99,7 @@ const MODELS = [
         title: 'Spiny Lizard',
         file: 'assets/models/lizard.glb',
         size: '0.8 MB',
-        description: 'A stylised spiny lizard sculpt with mottled, vertex-painted scales.',
+        description: 'A stylized spiny lizard sculpt with mottled, vertex-painted scales.',
         alt: 'A 3D model of a green spiny lizard with orange-tipped spikes'
     }
 ];
